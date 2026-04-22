@@ -1,0 +1,3846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Life OS">
+<meta name="theme-color" content="#0f0e0c">
+<meta name="app-version" content="2026-04-19" id="app-version">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="Your personal operating system">
+<title>Life OS</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0f0e0c;--bg2:#161512;--bg3:#1d1b17;
+  --surface:#111111;--border:#2a2722;--border2:#383430;
+  --text:#e8e4dc;--text2:#9a9389;--text3:#5a554e;
+  --gold:#c9a84c;--gold-dim:rgba(201,168,76,.1);--gold-dim2:rgba(201,168,76,.06);
+  --green:#6dba7f;--green-dim:rgba(109,186,127,.1);
+  --red:#d4655a;--red-dim:rgba(212,101,90,.1);
+  --blue:#6b9fd4;--blue-dim:rgba(107,159,212,.1);
+  --purple:#9b7fc4;--purple-dim:rgba(155,127,196,.1);
+  --teal:#4db8aa;--teal-dim:rgba(77,184,170,.1);
+  --coral:#d4735a;--coral-dim:rgba(212,115,90,.1);
+  --serif:'Fraunces',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;
+  --r:6px;--nav-h:64px;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px}
+#app{display:flex;flex-direction:column;height:100%;max-width:480px;margin:0 auto;position:relative}
+.screen{display:none;flex-direction:column;flex:1;overflow:hidden}
+.screen.active{display:flex}
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.scroll-area::-webkit-scrollbar{display:none}
+
+/* ── Top Bar ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.topbar-title{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--text)}
+.topbar-sub{font-size:12px;color:var(--text3);margin-top:1px}
+.icon-btn{height:34px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border);color:var(--text2);cursor:pointer;border-radius:var(--r);font-size:14px;padding:0 12px;transition:all .15s;gap:6px;font-family:var(--sans);font-size:12px;font-weight:500}
+.icon-btn:active{border-color:var(--gold);color:var(--gold)}
+
+/* ── Bottom Nav ── */
+.bottom-nav{height:var(--nav-h);border-top:1px solid var(--border);display:flex;align-items:stretch;background:var(--bg);flex-shrink:0}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;border:none;background:none;color:var(--text3);font-family:var(--sans);transition:color .15s;position:relative}
+.nav-item.active{color:var(--gold)}
+.nav-item:active{opacity:.7}
+.nav-icon{font-size:18px;line-height:1}
+.nav-label{font-size:10px;font-weight:500;letter-spacing:.04em}
+.nav-item.active::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:24px;height:2px;background:var(--gold)}
+.nav-capture{position:relative;top:-10px}
+.nav-capture-inner{width:52px;height:52px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;color:#0f0e0c;box-shadow:0 4px 20px rgba(201,168,76,.35);transition:transform .15s}
+.nav-capture:active .nav-capture-inner{transform:scale(.93)}
+
+/* ── Section heads ── */
+.section-head{padding:18px 20px 8px;font-size:10px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;font-weight:500}
+
+/* ── Cards ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:12px}
+.card-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.card-head-icon{font-size:16px}
+.card-head-title{font-size:13px;font-weight:500;color:var(--text);flex:1}
+.card-body{padding:14px 16px}
+
+/* ── HOME ── */
+.home-header{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
+.greeting{font-family:var(--serif);font-size:26px;font-weight:300;font-style:italic;color:var(--text);line-height:1.2}
+.date-line{font-size:12px;color:var(--text3);margin-top:4px;font-weight:300}
+
+/* Daily briefing card */
+.briefing-card{margin:16px 20px 0;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:border-color .2s}
+.briefing-card:active{border-color:var(--gold)}
+.briefing-head{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)}
+.briefing-topic{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);background:var(--gold-dim);padding:2px 8px;border-radius:4px}
+.briefing-time{font-size:10px;color:var(--text3);margin-left:auto}
+.briefing-body{padding:12px 14px}
+.briefing-what{font-size:14px;font-weight:500;color:var(--text);margin-bottom:4px;line-height:1.4}
+.briefing-why{font-size:12px;color:var(--text2);line-height:1.5}
+.briefing-loading{padding:16px 14px;font-size:13px;color:var(--text3);font-style:italic}
+
+/* Pulse strip */
+.pulse-strip{display:flex;border-bottom:1px solid var(--border);margin-top:16px}
+.pulse-item{flex:1;padding:12px 16px;border-right:1px solid var(--border);cursor:pointer;transition:background .15s}
+.pulse-item:last-child{border-right:none}
+.pulse-item:active{background:var(--bg2)}
+.pulse-val{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--text);line-height:1}
+.pulse-val.gold{color:var(--gold)} .pulse-val.green{color:var(--green)} .pulse-val.blue{color:var(--blue)}
+.pulse-key{font-size:10px;color:var(--text3);margin-top:3px;letter-spacing:.04em;text-transform:uppercase}
+
+/* Domain nav */
+.domain-nav{display:flex;gap:0;border-bottom:1px solid var(--border)}
+.domain-btn{flex:1;padding:10px 4px;text-align:center;cursor:pointer;border:none;background:none;font-family:var(--sans);font-size:11px;font-weight:500;color:var(--text3);letter-spacing:.04em;transition:all .15s;border-bottom:2px solid transparent}
+.domain-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.domain-btn:active{opacity:.7}
+
+/* Module grid */
+.module-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-bottom:1px}
+.module-card{background:var(--bg);padding:16px;cursor:pointer;transition:background .15s;position:relative;min-height:90px;animation:fadeUp .35s ease both}
+.module-card:active{background:var(--bg2)}
+.module-card.wide{grid-column:span 2;min-height:70px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.mc-icon{font-size:20px;margin-bottom:8px;display:block}
+.mc-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
+.mc-stat{font-size:11px;color:var(--text3)}
+.mc-badge{position:absolute;top:12px;right:12px;font-size:10px;font-weight:500;padding:2px 7px;border-radius:8px}
+.badge-gold{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(201,168,76,.2)}
+.badge-green{background:var(--green-dim);color:var(--green);border:1px solid rgba(109,186,127,.2)}
+.badge-red{background:var(--red-dim);color:var(--red);border:1px solid rgba(212,101,90,.2)}
+
+/* Insights */
+.insights-strip{margin:0 20px 20px;border:1px solid var(--border);background:var(--bg2);border-radius:var(--r)}
+.insight-row{display:flex;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);align-items:flex-start}
+.insight-row:last-child{border-bottom:none}
+.insight-dot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.dot-gold{background:var(--gold)} .dot-green{background:var(--green)} .dot-blue{background:var(--blue)} .dot-red{background:var(--red)} .dot-purple{background:var(--purple)}
+.insight-text{font-size:13px;color:var(--text2);line-height:1.5}
+.insight-text strong{color:var(--text);font-weight:500}
+
+/* ── HABITS ── */
+.habits-wrap{padding:16px 20px}
+.habit-row{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;transition:border-color .15s}
+.habit-done{border-color:var(--green)!important}
+.habit-icon{font-size:22px;flex-shrink:0}
+.habit-info{flex:1}
+.habit-name{font-size:14px;font-weight:500;color:var(--text)}
+.habit-streak{font-size:11px;color:var(--text3);margin-top:2px}
+.habit-check{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s;flex-shrink:0}
+.habit-check.done{background:var(--green);border-color:var(--green);color:white}
+.add-habit-btn{width:100%;padding:12px;background:none;border:1px dashed var(--border2);color:var(--text3);font-family:var(--sans);font-size:13px;border-radius:var(--r);cursor:pointer;transition:all .15s;margin-top:4px}
+.add-habit-btn:active{border-color:var(--gold);color:var(--gold)}
+
+/* ── INTEL FEED ── */
+.intel-wrap{padding:16px 20px}
+.intel-scan-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:16px}
+.intel-panel-label{font-size:10px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+.intel-row{display:flex;gap:8px}
+.intel-input{flex:1;background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--sans);font-size:14px;padding:10px 12px;outline:none;border-radius:var(--r);transition:border-color .15s}
+.intel-input:focus{border-color:var(--gold)}
+.intel-input::placeholder{color:var(--text3)}
+.scan-btn{background:var(--gold);color:#0f0e0c;border:none;font-family:var(--sans);font-size:12px;font-weight:500;padding:10px 16px;border-radius:var(--r);cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.scan-btn:disabled{opacity:.5;cursor:not-allowed}
+.scan-status{font-size:11px;color:var(--text3);margin-top:8px;min-height:16px}
+.scan-status.active{color:var(--gold)}
+.topic-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.topic-chip{font-size:11px;padding:4px 10px;border:1px solid var(--border2);color:var(--text3);cursor:pointer;border-radius:4px;transition:all .15s;letter-spacing:.04em}
+.topic-chip:active,.topic-chip.active{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
+.intel-entry{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .15s;animation:fadeUp .3s ease}
+.intel-entry:active{border-color:var(--border2)}
+.intel-entry.open{border-color:var(--gold)}
+.ie-meta{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.ie-topic{font-size:10px;color:var(--gold);background:var(--gold-dim);padding:2px 8px;border-radius:3px;letter-spacing:.06em;text-transform:uppercase}
+.ie-date{font-size:10px;color:var(--text3)}
+.ie-action{font-size:10px;color:#ffaa44;background:rgba(255,170,68,.1);border:1px solid rgba(255,170,68,.2);padding:2px 8px;border-radius:3px;margin-left:auto}
+.ie-what{font-size:13px;font-weight:500;color:var(--text);line-height:1.5;margin-bottom:4px}
+.ie-preview{font-size:12px;color:var(--text3);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ie-expanded{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.intel-entry.open .ie-expanded{display:block}
+.intel-entry.open .ie-preview{display:none}
+.ie-section-label{font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;margin-top:12px}
+.ie-section-label:first-child{margin-top:0}
+.ie-section-text{font-size:13px;color:var(--text2);line-height:1.6}
+.ie-relevance{background:var(--gold-dim);border-left:2px solid var(--gold);padding:8px 12px;font-size:13px;color:var(--text);line-height:1.5}
+.ie-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.ie-tag{font-size:10px;color:var(--text3);border:1px solid var(--border);padding:2px 8px;border-radius:3px}
+.ie-notes{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--sans);font-size:12px;padding:8px 10px;outline:none;resize:none;min-height:50px;border-radius:var(--r);margin-top:8px}
+
+/* ── STOCKS ── */
+.stocks-wrap{padding:16px 20px}
+.stock-input-row{display:flex;gap:8px;margin-bottom:16px}
+.stock-input{flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--sans);font-size:14px;padding:10px 14px;outline:none;border-radius:var(--r);text-transform:uppercase;transition:border-color .15s}
+.stock-input:focus{border-color:var(--gold)}
+.stock-input::placeholder{color:var(--text3);text-transform:none}
+.verdict-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:12px;animation:fadeUp .3s ease}
+.vc-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.vc-ticker{font-family:var(--serif);font-size:20px;font-weight:300;color:var(--text)}
+.vc-price{font-size:12px;color:var(--text3)}
+.vc-verdict{margin-left:auto;font-size:11px;font-weight:500;padding:4px 12px;border-radius:4px}
+.verdict-hold{background:var(--gold-dim);color:var(--gold)}
+.verdict-buy{background:var(--green-dim);color:var(--green)}
+.verdict-trim{background:rgba(255,170,68,.1);color:#ffaa44}
+.verdict-sell{background:var(--red-dim);color:var(--red)}
+.vc-body{padding:14px 16px}
+.vc-section{margin-bottom:10px}
+.vc-section-label{font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.vc-section-text{font-size:13px;color:var(--text2);line-height:1.6}
+.vc-bull{border-left:2px solid var(--green);padding:6px 10px;margin-bottom:6px;background:var(--green-dim)}
+.vc-bear{border-left:2px solid var(--red);padding:6px 10px;background:var(--red-dim)}
+.vc-footer{padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text3)}
+.vc-confidence{margin-left:auto;color:var(--gold)}
+
+/* ── HEALTH ── */
+.health-wrap{padding:16px 20px}
+.upload-methods{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.upload-method{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 12px;text-align:center;cursor:pointer;transition:all .15s}
+.upload-method:active{border-color:var(--gold)}
+.um-icon{font-size:26px;margin-bottom:6px}
+.um-label{font-size:12px;font-weight:500;color:var(--text2)}
+.um-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.meds-section{margin-top:8px}
+.med-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px}
+.med-icon{font-size:20px;flex-shrink:0}
+.med-info{flex:1}
+.med-name{font-size:13px;font-weight:500;color:var(--text)}
+.med-dose{font-size:11px;color:var(--text3)}
+.med-check{width:26px;height:26px;border-radius:50%;border:2px solid var(--border2);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .2s;flex-shrink:0}
+.med-check.done{background:var(--green);border-color:var(--green);color:white}
+
+/* ── REVIEW ── */
+.review-wrap{padding:16px 20px}
+.review-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 10px;text-align:center}
+.stat-val{font-family:var(--serif);font-size:28px;font-weight:300;color:var(--text);line-height:1;margin-bottom:4px}
+.stat-val.gold{color:var(--gold)} .stat-val.green{color:var(--green)} .stat-val.red{color:var(--red)}
+.stat-key{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+.win-row{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+.win-row:last-child{border-bottom:none}
+.win-emoji{font-size:18px;flex-shrink:0}
+.win-text{font-size:13px;color:var(--text2);line-height:1.5;flex:1}
+.win-text strong{color:var(--text);font-weight:500}
+.gen-btn{width:100%;padding:13px;background:transparent;border:1px solid var(--border2);color:var(--text2);font-family:var(--sans);font-size:13px;cursor:pointer;border-radius:var(--r);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px}
+.gen-btn:active{border-color:var(--gold);color:var(--gold)}
+
+/* ── JOURNAL ── */
+.journal-wrap{padding:16px 20px}
+.journal-entry-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .15s}
+.journal-entry-card:active{border-color:var(--border2)}
+.je-date{font-size:11px;color:var(--text3);margin-bottom:6px}
+.je-preview{font-size:13px;color:var(--text2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.journal-textarea{width:100%;min-height:180px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--serif);font-size:15px;font-weight:300;font-style:italic;line-height:1.7;padding:16px;resize:none;outline:none;border-radius:var(--r);margin-bottom:10px;transition:border-color .15s}
+.journal-textarea:focus{border-color:var(--gold)}
+.journal-textarea::placeholder{color:var(--text3)}
+
+/* ── SETTINGS ── */
+.settings-wrap{padding:16px 20px}
+.settings-section{margin-bottom:24px}
+.settings-section-title{font-size:10px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;font-weight:500}
+.settings-row{display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;cursor:pointer;transition:border-color .15s}
+.settings-row:active{border-color:var(--border2)}
+.sr-icon{font-size:18px;flex-shrink:0}
+.sr-info{flex:1}
+.sr-label{font-size:14px;color:var(--text);font-weight:400}
+.sr-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.sr-right{font-size:12px;color:var(--text3)}
+.ctx-input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--sans);font-size:14px;padding:11px 14px;outline:none;border-radius:var(--r);margin-bottom:8px;transition:border-color .15s}
+.ctx-input:focus{border-color:var(--gold)}
+.ctx-input::placeholder{color:var(--text3)}
+.save-btn-full{width:100%;padding:14px;background:var(--gold);color:#0f0e0c;border:none;font-family:var(--sans);font-size:14px;font-weight:500;border-radius:var(--r);cursor:pointer;transition:opacity .15s;margin-top:4px}
+.save-btn-full:active{opacity:.85}
+
+/* ── Capture Sheet ── */
+.sheet-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;opacity:0;transition:opacity .25s;backdrop-filter:blur(2px)}
+.sheet-overlay.open{display:block}
+.sheet-overlay.visible{opacity:1}
+.sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:480px;background:var(--bg2);border-top:1px solid var(--border2);border-radius:16px 16px 0 0;z-index:201;padding:0 0 32px;transition:transform .32s cubic-bezier(.32,.72,0,1)}
+.sheet.open{transform:translateX(-50%) translateY(0)}
+.sheet-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 16px}
+.sheet-title{font-family:var(--serif);font-size:18px;font-weight:300;font-style:italic;color:var(--text2);padding:0 20px 12px;border-bottom:1px solid var(--border)}
+.sheet-body{padding:14px 20px}
+.sheet-types{display:flex;gap:8px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none}
+.sheet-type{display:flex;align-items:center;gap:5px;padding:7px 12px;border:1px solid var(--border);background:var(--bg3);color:var(--text3);border-radius:20px;font-size:12px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.sheet-type.selected{border-color:var(--gold);background:var(--gold-dim);color:var(--gold)}
+.sheet-textarea{width:100%;min-height:90px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;padding:12px;resize:none;outline:none;border-radius:var(--r);margin-bottom:10px;transition:border-color .15s}
+.sheet-textarea:focus{border-color:var(--gold)}
+.sheet-textarea::placeholder{color:var(--text3)}
+.sheet-submit{width:100%;padding:14px;background:var(--gold);color:#0f0e0c;border:none;font-family:var(--sans);font-size:14px;font-weight:500;cursor:pointer;border-radius:var(--r);transition:opacity .15s}
+.sheet-submit:active{opacity:.85}
+
+/* ── API Manager ── */
+.api-screen-wrap{padding:16px 20px}
+.api-hero{
+  background:linear-gradient(135deg,#1a2a4a 0%,#0f1a2e 100%);
+  border-radius:var(--r);padding:18px 20px;margin-bottom:16px;
+  position:relative;overflow:hidden;
+}
+.api-hero::after{content:'🔑';position:absolute;right:14px;top:50%;
+  transform:translateY(-50%);font-size:44px;opacity:.15}
+.api-hero-title{font-family:var(--serif);font-size:18px;font-weight:300;
+  color:var(--text);margin-bottom:4px}
+.api-hero-sub{font-size:12px;color:var(--text3);line-height:1.5}
+.api-status-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.api-pill{font-size:11px;font-weight:500;padding:4px 10px;border-radius:12px;
+  display:flex;align-items:center;gap:5px}
+.api-pill.active{background:var(--green-dim);color:var(--green);
+  border:1px solid rgba(109,186,127,.25)}
+.api-pill.inactive{background:var(--bg3);color:var(--text3);
+  border:1px solid var(--border)}
+.api-pill-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+.provider-card{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);margin-bottom:10px;overflow:hidden;
+  transition:border-color .15s}
+.provider-card.has-key{border-color:rgba(109,186,127,.3)}
+.pc-head{display:flex;align-items:center;gap:12px;padding:14px 16px;
+  cursor:pointer}
+.pc-head:active{background:var(--bg2)}
+.pc-icon{font-size:22px;flex-shrink:0}
+.pc-info{flex:1}
+.pc-name{font-size:14px;font-weight:500;color:var(--text)}
+.pc-desc{font-size:11px;color:var(--text3);margin-top:2px;line-height:1.4}
+.pc-status{font-size:10px;font-weight:500;padding:3px 9px;border-radius:8px;
+  flex-shrink:0}
+.pc-status.set{background:var(--green-dim);color:var(--green)}
+.pc-status.unset{background:var(--bg3);color:var(--text3);border:1px solid var(--border)}
+.pc-body{display:none;padding:0 16px 14px;border-top:1px solid var(--border)}
+.pc-body.open{display:block}
+.pc-strengths{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;margin-top:10px}
+.pc-strength{font-size:10px;color:var(--blue);background:var(--blue-dim);
+  border:1px solid rgba(107,159,212,.2);padding:2px 8px;border-radius:4px}
+.pc-key-row{display:flex;gap:8px;margin-bottom:8px}
+.pc-key-input{flex:1;background:var(--bg2);border:1px solid var(--border);
+  color:var(--text);font-family:monospace;font-size:12px;
+  padding:9px 12px;outline:none;border-radius:var(--r);
+  transition:border-color .15s;letter-spacing:.03em}
+.pc-key-input:focus{border-color:var(--gold)}
+.pc-key-input::placeholder{color:var(--text3);letter-spacing:0;font-family:var(--sans)}
+.pc-save-btn{background:var(--gold);color:#0f0e0c;border:none;
+  font-family:var(--sans);font-size:12px;font-weight:500;
+  padding:9px 16px;border-radius:var(--r);cursor:pointer;
+  white-space:nowrap;transition:opacity .15s}
+.pc-save-btn:active{opacity:.85}
+.pc-clear-btn{background:none;border:1px solid var(--border2);color:var(--text3);
+  font-family:var(--sans);font-size:11px;padding:6px 12px;
+  border-radius:var(--r);cursor:pointer;transition:all .15s}
+.pc-clear-btn:active{border-color:var(--red);color:var(--red)}
+.pc-key-hint{font-size:11px;color:var(--text3);line-height:1.5;margin-bottom:6px}
+.pc-key-link{color:var(--blue);text-decoration:none;font-size:11px}
+.pc-key-link:hover{text-decoration:underline}
+
+.module-routing-section{margin-top:16px}
+.routing-row{display:flex;align-items:center;gap:10px;padding:10px 14px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);margin-bottom:8px}
+.routing-icon{font-size:18px;flex-shrink:0}
+.routing-name{font-size:13px;color:var(--text);flex:1;font-weight:400}
+.routing-select{background:var(--bg2);border:1px solid var(--border2);
+  color:var(--text2);font-family:var(--sans);font-size:12px;
+  padding:5px 10px;border-radius:var(--r);outline:none;cursor:pointer;
+  transition:border-color .15s}
+.routing-select:focus{border-color:var(--gold)}
+.routing-select:disabled{opacity:.4;cursor:not-allowed}
+
+.api-test-row{display:flex;gap:8px;margin-top:12px}
+.api-test-btn{flex:1;padding:11px;background:none;border:1px solid var(--border2);
+  color:var(--text2);font-family:var(--sans);font-size:12px;font-weight:500;
+  border-radius:var(--r);cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;justify-content:center;gap:6px}
+.api-test-btn:active{border-color:var(--gold);color:var(--gold)}
+.api-test-result{margin-top:8px;padding:10px 14px;background:var(--bg2);
+  border-radius:var(--r);font-size:12px;color:var(--text2);line-height:1.5;
+  display:none;animation:popIn .2s ease}
+.api-test-result.ok{border-left:2px solid var(--green);color:var(--green)}
+.api-test-result.fail{border-left:2px solid var(--red);color:var(--red)}
+
+
+/* ── File Status Bar ── */
+#fileBar{
+  position:fixed;bottom:var(--nav-h);left:50%;
+  transform:translateX(-50%);
+  width:100%;max-width:480px;
+  z-index:150;
+  padding:0 16px 6px;
+  pointer-events:none;
+}
+#fileBarInner{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 14px;
+  border-radius:20px;
+  font-size:11px;font-weight:500;font-family:var(--sans);
+  letter-spacing:.02em;
+  transition:all .4s ease;
+  pointer-events:all;
+  cursor:pointer;
+  max-width:fit-content;
+  margin:0 auto;
+  opacity:0;
+  transform:translateY(6px);
+}
+#fileBar.linked #fileBarInner{
+  background:rgba(109,186,127,.15);
+  border:1px solid rgba(109,186,127,.3);
+  color:var(--green);
+  opacity:1;transform:translateY(0);
+}
+#fileBar.unlinked #fileBarInner{
+  background:rgba(201,168,76,.12);
+  border:1px solid rgba(201,168,76,.3);
+  color:var(--gold);
+  opacity:1;transform:translateY(0);
+}
+#fileBar.saving #fileBarInner{
+  background:rgba(107,159,212,.12);
+  border:1px solid rgba(107,159,212,.25);
+  color:var(--blue);
+  opacity:1;transform:translateY(0);
+}
+#fileBar.error #fileBarInner{
+  background:rgba(212,101,90,.12);
+  border:1px solid rgba(212,101,90,.25);
+  color:var(--red);
+  opacity:1;transform:translateY(0);
+}
+.fbar-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;
+  background:currentColor}
+
+/* ── File Link Modal ── */
+#fileLinkModal{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.75);z-index:400;
+  align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(3px);
+}
+#fileLinkModal.open{display:flex}
+#fileLinkSheet{
+  width:100%;max-width:480px;
+  background:var(--bg2);
+  border-top:1px solid var(--border2);
+  border-radius:16px 16px 0 0;
+  padding:0 0 40px;
+  animation:slideUp .3s cubic-bezier(.32,.72,0,1);
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.flm-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 20px}
+.flm-title{font-family:var(--serif);font-size:20px;font-weight:300;font-style:italic;
+  color:var(--text);padding:0 24px 6px}
+.flm-sub{font-size:13px;color:var(--text3);padding:0 24px 20px;line-height:1.6;
+  border-bottom:1px solid var(--border)}
+.flm-option{display:flex;align-items:center;gap:14px;padding:16px 24px;
+  border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.flm-option:last-child{border-bottom:none}
+.flm-option:active{background:var(--bg3)}
+.flm-opt-icon{font-size:24px;flex-shrink:0}
+.flm-opt-info{flex:1}
+.flm-opt-label{font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px}
+.flm-opt-sub{font-size:12px;color:var(--text3);line-height:1.4}
+.flm-opt-badge{font-size:10px;font-weight:500;padding:3px 8px;border-radius:8px;
+  background:var(--green-dim);color:var(--green);border:1px solid rgba(109,186,127,.2)}
+.flm-cancel{display:block;width:calc(100% - 48px);margin:16px 24px 0;
+  padding:13px;text-align:center;background:none;border:1px solid var(--border2);
+  color:var(--text3);font-family:var(--sans);font-size:13px;border-radius:var(--r);
+  cursor:pointer;transition:all .15s}
+.flm-cancel:active{border-color:var(--gold);color:var(--gold)}
+
+
+/* ── PIN Lock Screen ── */
+#pinScreen{
+  display:none;position:fixed;inset:0;
+  background:var(--bg);z-index:500;
+  flex-direction:column;align-items:center;justify-content:center;
+  padding:32px 24px;max-width:480px;margin:0 auto;
+}
+#pinScreen.show{display:flex}
+.pin-logo{font-family:var(--serif);font-size:28px;font-weight:300;font-style:italic;color:var(--text);margin-bottom:8px}
+.pin-sub{font-size:13px;color:var(--text3);margin-bottom:40px;font-weight:300}
+.pin-dots{display:flex;gap:14px;margin-bottom:40px}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border2);transition:all .2s}
+.pin-dot.filled{background:var(--gold);border-color:var(--gold)}
+.pin-dot.error{background:var(--red);border-color:var(--red)}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:240px}
+.pin-key{
+  height:64px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);display:flex;align-items:center;justify-content:center;
+  font-size:22px;font-weight:300;color:var(--text);cursor:pointer;
+  font-family:var(--serif);transition:all .15s;user-select:none;
+}
+.pin-key:active{background:var(--bg3);border-color:var(--gold);color:var(--gold)}
+.pin-key.del{font-size:16px;color:var(--text3)}
+.pin-key.empty{background:transparent;border:none;cursor:default}
+.pin-msg{font-size:12px;color:var(--text3);margin-top:24px;min-height:20px;text-align:center}
+.pin-msg.error{color:var(--red)}
+.pin-setup-label{font-size:13px;color:var(--text2);margin-bottom:16px;text-align:center;line-height:1.5}
+.pin-setup-step{font-size:11px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;margin-bottom:24px}
+
+/* ── Finance Tracker ── */
+.fin-wrap{padding:16px 20px}
+.fin-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.fin-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 10px;text-align:center}
+.fin-stat-val{font-family:var(--serif);font-size:22px;font-weight:700;line-height:1;margin-bottom:4px}
+.fin-stat-val.income{color:var(--green)} .fin-stat-val.expense{color:var(--red)} .fin-stat-val.net.pos{color:var(--green)} .fin-stat-val.net.neg{color:var(--red)}
+.fin-stat-key{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+.fin-entry{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;animation:fadeUp .25s ease both}
+.fin-entry-icon{font-size:22px;flex-shrink:0}
+.fin-entry-info{flex:1}
+.fin-entry-desc{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
+.fin-entry-meta{font-size:11px;color:var(--text3)}
+.fin-entry-amt{font-size:15px;font-weight:700}
+.fin-entry-amt.income{color:var(--green)} .fin-entry-amt.expense{color:var(--red)}
+.fin-cat-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px;padding-bottom:2px}
+.fin-cat-row::-webkit-scrollbar{display:none}
+.fin-cat{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid var(--border);background:var(--surface);color:var(--text3);cursor:pointer;white-space:nowrap;transition:all .15s}
+.fin-cat.active{border-color:var(--gold);background:rgba(201,168,76,.1);color:var(--gold)}
+
+/* ── Goal Tracker ── */
+.goal-wrap{padding:16px 20px}
+.goal-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;animation:fadeUp .25s ease both}
+.goal-card.done{border-color:var(--green);background:rgba(90,180,100,.04)}
+.goal-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.goal-icon{font-size:26px;flex-shrink:0}
+.goal-info{flex:1}
+.goal-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px}
+.goal-why{font-size:12px;color:var(--text3);line-height:1.5}
+.goal-progress-wrap{margin-bottom:10px}
+.goal-progress-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-bottom:4px}
+.goal-progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),#e8a030);transition:width .4s ease}
+.goal-progress-fill.done{background:var(--green)}
+.goal-progress-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text3)}
+.goal-actions{display:flex;gap:8px}
+.goal-btn{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;border:none;cursor:pointer;transition:all .15s;font-family:var(--sans)}
+.goal-btn.log{background:var(--gold);color:#1a1500}
+.goal-btn.log:active{opacity:.8}
+.goal-btn.ai{background:var(--surface);border:1px solid var(--border);color:var(--text2)}
+.goal-btn.ai:active{border-color:var(--gold)}
+.goal-milestone{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2)}
+.goal-milestone:last-child{border-bottom:none}
+.goal-milestone-dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--border2);flex-shrink:0}
+.goal-milestone-dot.done{background:var(--green);border-color:var(--green)}
+
+/* ── Energy Tracker ── */
+.energy-wrap{padding:16px 20px}
+.energy-log-card{background:linear-gradient(135deg,#1a1400 0%,#2a2000 100%);border:1px solid rgba(201,168,76,.25);border-radius:var(--r);padding:20px;margin-bottom:16px;text-align:center}
+.energy-dial{font-size:72px;line-height:1;margin-bottom:8px;transition:transform .2s}
+.energy-label{font-family:var(--serif);font-size:20px;color:var(--gold);margin-bottom:16px}
+.energy-btns{display:flex;gap:10px;justify-content:center}
+.energy-btn{width:48px;height:48px;border-radius:50%;border:2px solid rgba(201,168,76,.3);background:rgba(201,168,76,.08);color:var(--gold);font-size:20px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.energy-btn.active{border-color:var(--gold);background:rgba(201,168,76,.25);transform:scale(1.15)}
+.energy-btn:active{transform:scale(.92)}
+.energy-history{display:flex;gap:6px;align-items:flex-end;height:60px;margin-bottom:8px}
+.energy-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.energy-bar{width:100%;border-radius:3px 3px 0 0;background:rgba(201,168,76,.15);transition:height .3s ease}
+.energy-bar.filled{background:var(--gold)}
+.energy-bar-label{font-size:9px;color:var(--text3);text-align:center}
+.energy-insight{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:12px}
+.energy-peak{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);border-radius:var(--r);margin-bottom:12px}
+.energy-peak-icon{font-size:22px}
+.energy-peak-info{flex:1}
+.energy-peak-label{font-size:12px;font-weight:700;color:var(--gold)}
+.energy-peak-text{font-size:12px;color:var(--text3);margin-top:2px}
+
+
+.yoga-wrap{padding:16px 20px}
+.yoga-start-card{
+  background:linear-gradient(135deg,#2b6cb0 0%,#1a4a7a 100%);
+  border-radius:var(--r);padding:20px;margin-bottom:16px;
+  position:relative;overflow:hidden;
+}
+.yoga-start-card::after{content:'🧘';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:48px;opacity:.2}
+.yoga-start-title{font-family:var(--serif);font-size:20px;font-weight:300;color:white;margin-bottom:4px}
+.yoga-start-sub{font-size:12px;color:rgba(255,255,255,.7);margin-bottom:16px}
+.yoga-start-btn{padding:10px 20px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:white;font-family:var(--sans);font-size:13px;font-weight:500;border-radius:var(--r);cursor:pointer;transition:all .15s}
+.yoga-start-btn:active{background:rgba(255,255,255,.25)}
+.yoga-log-form{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:16px;display:none;animation:popIn .3s ease}
+.yoga-log-form.show{display:block}
+.yoga-field{margin-bottom:14px}
+.yoga-field-label{font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.yoga-chips{display:flex;flex-wrap:wrap;gap:6px}
+.yoga-chip{padding:6px 12px;border:1px solid var(--border2);color:var(--text3);border-radius:20px;font-size:12px;cursor:pointer;transition:all .15s}
+.yoga-chip.sel{border-color:var(--blue);color:var(--blue);background:var(--blue-dim)}
+.yoga-chip:active{opacity:.7}
+.yoga-slider-row{display:flex;align-items:center;gap:12px}
+.yoga-slider{flex:1;accent-color:var(--gold)}
+.yoga-slider-val{font-family:var(--serif);font-size:16px;font-weight:300;color:var(--gold);width:32px;text-align:right}
+.yoga-textarea{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--sans);font-size:14px;padding:10px 12px;outline:none;border-radius:var(--r);resize:none;min-height:60px;transition:border-color .15s}
+.yoga-textarea:focus{border-color:var(--gold)}
+.yoga-textarea::placeholder{color:var(--text3)}
+.yoga-save-btn{width:100%;padding:13px;background:var(--gold);color:#0f0e0c;border:none;font-family:var(--sans);font-size:14px;font-weight:500;border-radius:var(--r);cursor:pointer;margin-top:4px;transition:opacity .15s}
+.yoga-save-btn:active{opacity:.85}
+.yoga-session-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;animation:fadeUp .3s ease}
+.ysc-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.ysc-style{font-size:11px;color:var(--blue);background:var(--blue-dim);padding:2px 8px;border-radius:3px;letter-spacing:.04em}
+.ysc-date{font-size:11px;color:var(--text3)}
+.ysc-duration{font-family:var(--serif);font-size:16px;font-weight:300;color:var(--gold);margin-left:auto}
+.ysc-body{font-size:13px;color:var(--text2);line-height:1.5}
+.ysc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.ysc-tag{font-size:10px;color:var(--text3);border:1px solid var(--border);padding:2px 8px;border-radius:3px}
+.yoga-insight{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:12px 14px;margin-bottom:12px;font-size:13px;color:var(--text2);line-height:1.5;border-left:2px solid var(--blue)}
+.yoga-insight strong{color:var(--text);font-weight:500}
+.yoga-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.yoga-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 10px;text-align:center}
+.yoga-stat-val{font-family:var(--serif);font-size:24px;font-weight:300;color:var(--blue);line-height:1;margin-bottom:3px}
+.yoga-stat-key{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+</style>
+</head>
+<body>
+<!-- ══ FILE STATUS BAR ════════════════════════════════ -->
+<div id="fileBar">
+  <div id="fileBarInner" onclick="openFileLinkModal()">
+    <div class="fbar-dot"></div>
+    <span id="fileBarText">No data file linked</span>
+  </div>
+</div>
+
+<!-- ══ FILE LINK MODAL ════════════════════════════════ -->
+<div id="fileLinkModal">
+  <div id="fileLinkSheet">
+    <div class="flm-handle"></div>
+    <div class="flm-title">Data folder</div>
+    <div class="flm-sub" id="flmSub">
+      Link a JSON file so your data persists permanently — even if browser cache clears.
+      Store it in Google Drive or Dropbox for automatic cloud backup.
+    </div>
+    <div class="flm-option" id="flmLinkNew" onclick="fsaLinkNew()">
+      <div class="flm-opt-icon">📁</div>
+      <div class="flm-opt-info">
+        <div class="flm-opt-label">Choose a folder</div>
+        <div class="flm-opt-sub">Choose or create a folder — saves data.json + original files inside it. Navigate to Google Drive.</div>
+      </div>
+      <span class="flm-opt-badge">Recommended</span>
+    </div>
+    <div class="flm-option" id="flmOpenExisting" onclick="fsaOpenExisting()">
+      <div class="flm-opt-icon">🔗</div>
+      <div class="flm-opt-info">
+        <div class="flm-opt-label">Relink existing folder</div>
+        <div class="flm-opt-sub">Relink the folder you used before — restores your data and resumes auto-save.</div>
+      </div>
+    </div>
+    <div class="flm-option" onclick="exportFallback()">
+      <div class="flm-opt-icon">📤</div>
+      <div class="flm-opt-info">
+        <div class="flm-opt-label">Export data now</div>
+        <div class="flm-opt-sub">Download a JSON backup manually. Safe even without file linking.</div>
+      </div>
+    </div>
+    <div class="flm-option" id="flmImportOption" onclick="document.getElementById('fileInputImport').click()">
+      <div class="flm-opt-icon">📥</div>
+      <div class="flm-opt-info">
+        <div class="flm-opt-label">Import from backup</div>
+        <div class="flm-opt-sub">Restore from a previously exported Life OS JSON file.</div>
+      </div>
+    </div>
+    <button class="flm-cancel" onclick="closeFileLinkModal()">Cancel</button>
+    <input type="file" id="fileInputImport" accept=".json,application/json" onchange="handleImport(this)">
+  </div>
+</div>
+
+<!-- ══ PIN LOCK SCREEN ════════════════════════════════ -->
+<div id="pinScreen">
+  <div class="pin-logo">Life OS</div>
+  <div class="pin-sub" id="pinSub">Enter your PIN</div>
+  <div class="pin-setup-step" id="pinSetupStep"></div>
+  <div class="pin-setup-label" id="pinSetupLabel"></div>
+  <div class="pin-dots" id="pinDots">
+    <div class="pin-dot" id="pd0"></div>
+    <div class="pin-dot" id="pd1"></div>
+    <div class="pin-dot" id="pd2"></div>
+    <div class="pin-dot" id="pd3"></div>
+  </div>
+  <div class="pin-grid">
+    <div class="pin-key" onclick="pinPress('1')">1</div>
+    <div class="pin-key" onclick="pinPress('2')">2</div>
+    <div class="pin-key" onclick="pinPress('3')">3</div>
+    <div class="pin-key" onclick="pinPress('4')">4</div>
+    <div class="pin-key" onclick="pinPress('5')">5</div>
+    <div class="pin-key" onclick="pinPress('6')">6</div>
+    <div class="pin-key" onclick="pinPress('7')">7</div>
+    <div class="pin-key" onclick="pinPress('8')">8</div>
+    <div class="pin-key" onclick="pinPress('9')">9</div>
+    <div class="pin-key empty"></div>
+    <div class="pin-key" onclick="pinPress('0')">0</div>
+    <div class="pin-key del" onclick="pinDel()">⌫</div>
+  </div>
+  <div class="pin-msg" id="pinMsg"></div>
+</div>
+
+<div id="app">
+
+<!-- ══ HOME ══════════════════════════════════════════ -->
+<div id="screen-home" class="screen active">
+  <div class="scroll-area">
+    <div class="home-header">
+      <div class="greeting" id="greeting">Good morning.</div>
+      <div class="date-line" id="dateLine"></div>
+    </div>
+
+    <!-- Daily Briefing -->
+    <div class="briefing-card" id="briefingCard" onclick="navTo('intel')">
+      <div class="briefing-head">
+        <div class="briefing-topic" id="briefingTopic">AI</div>
+        <div class="briefing-time" id="briefingTime">Today</div>
+      </div>
+      <div id="briefingContent">
+        <div class="briefing-loading">Loading today's briefing...</div>
+      </div>
+    </div>
+
+    <!-- Pulse strip -->
+    <div class="pulse-strip">
+      <div class="pulse-item" onclick="navTo('habits')">
+        <div class="pulse-val green" id="pulseHabits">—</div>
+        <div class="pulse-key">Habits</div>
+      </div>
+      <div class="pulse-item" onclick="navTo('energy')">
+        <div class="pulse-val" id="pulseEnergy">—</div>
+        <div class="pulse-key">Energy</div>
+      </div>
+      <div class="pulse-item" onclick="navTo('finance')">
+        <div class="pulse-val" id="pulseFinance">—</div>
+        <div class="pulse-key">Net ₹</div>
+      </div>
+      <div class="pulse-item" onclick="navTo('intel')">
+        <div class="pulse-val gold" id="pulseIntel">—</div>
+        <div class="pulse-key">Intel</div>
+      </div>
+    </div>
+
+    <!-- Domain nav -->
+    <div class="domain-nav">
+      <button class="domain-btn active" onclick="setDomain('mind',this)">Mind</button>
+      <button class="domain-btn" onclick="setDomain('body',this)">Body</button>
+      <button class="domain-btn" onclick="setDomain('wealth',this)">Wealth</button>
+      <button class="domain-btn" onclick="setDomain('world',this)">World</button>
+    </div>
+
+    <!-- Module cards (domain-aware) -->
+    <div class="module-grid" id="moduleGrid"></div>
+
+    <!-- Insights -->
+    <div class="section-head">From your data</div>
+    <div class="insights-strip" id="insightsStrip">
+      <div class="insight-row">
+        <div class="insight-dot dot-gold"></div>
+        <div class="insight-text">Start logging to see AI insights here — patterns, wins, and things worth your attention.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HABITS ═════════════════════════════════════════ -->
+<div id="screen-habits" class="screen">
+  <div class="topbar">
+    <div><div class="topbar-title">✅ Habits</div><div class="topbar-sub">Daily consistency</div></div>
+    <button class="icon-btn" onclick="openAddHabit()">+ Add</button>
+  </div>
+  <div class="scroll-area">
+    <div class="habits-wrap">
+      <div class="section-head" style="padding-top:0">Today</div>
+      <div id="habitsList"></div>
+      <button class="add-habit-btn" onclick="openAddHabit()">+ Add a habit</button>
+      <div class="section-head">Streaks</div>
+      <div id="habitsStreaks"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ INTEL FEED ══════════════════════════════════════ -->
+<div id="screen-intel" class="screen">
+  <div class="topbar">
+    <div><div class="topbar-title">📡 Intel Feed</div><div class="topbar-sub">Your knowledge base</div></div>
+    <button class="icon-btn" onclick="exportIntel()">Export</button>
+  </div>
+  <div class="scroll-area">
+    <div class="intel-wrap">
+      <div class="intel-scan-panel">
+        <div class="intel-panel-label">// Scan</div>
+        <div class="intel-row">
+          <input class="intel-input" id="intelQuery" placeholder="Topic or custom query...">
+          <button class="scan-btn" id="scanBtn" onclick="runIntelScan()">Scan</button>
+        </div>
+        <div class="scan-status" id="scanStatus"></div>
+      </div>
+      <div class="topic-chips" id="topicChips"></div>
+      <div id="intelEntries"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ STOCKS ══════════════════════════════════════════ -->
+<div id="screen-stocks" class="screen">
+  <div class="topbar">
+    <div><div class="topbar-title">📈 Stock Scanner</div><div class="topbar-sub">Investment thesis health</div></div>
+  </div>
+  <div class="scroll-area">
+    <div class="stocks-wrap">
+      <div class="stock-input-row">
+        <input class="stock-input" id="stockTicker" placeholder="Enter ticker (e.g. NVDA)">
+        <button class="scan-btn" id="stockScanBtn" onclick="runStockScan()">Scan</button>
+      </div>
+      <div id="stockResult"></div>
+      <div class="section-head" style="padding-top:0">Saved verdicts</div>
+      <div id="savedVerdicts"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HEALTH ══════════════════════════════════════════ -->
+<div id="screen-health" class="screen">
+  <div class="topbar">
+    <div><div class="topbar-title">🩺 Health</div><div class="topbar-sub">Reports, medications, trends</div></div>
+  </div>
+  <div class="scroll-area">
+    <div class="health-wrap">
+      <div class="section-head" style="padding-top:0">Add a document</div>
+      <div class="upload-methods">
+        <div class="upload-method" onclick="document.getElementById('fileInputHealth').click()">
+          <div class="um-icon">📷</div><div class="um-label">Photo / PDF</div><div class="um-sub">Lab report or prescription</div>
+        </div>
+        <div class="upload-method" onclick="openSheet('health')">
+          <div class="um-icon">✏️</div><div class="um-label">Type notes</div><div class="um-sub">Doctor visit, symptoms</div>
+        </div>
+      </div>
+      <input type="file" id="fileInputHealth" accept="image/*,.pdf,application/pdf" onchange="handleHealthFile(this)">
+      <div id="healthDocResult"></div>
+      <div class="section-head">Today's medications</div>
+      <div id="medsList"></div>
+      <div class="section-head">Saved documents</div>
+      <div id="healthDocsList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ JOURNAL ═════════════════════════════════════════ -->
+<div id="screen-journal" class="screen">
+  <div class="topbar">
+    <div><div class="topbar-title">📓 Journal</div><div class="topbar-sub">Private reflection</div></div>
+    <button class="icon-btn" onclick="saveJournalEntry()">Save</button>
+  </div>
+  <div class="scroll-area">
+    <div class="journal-wrap">
+      <textarea class="journal-textarea" id="journalText" placeholder="What's on your mind..."></textarea>
+      <button class="gen-btn" onclick="getJournalPrompt()" style="margin-bottom:16px">✨ Give me a reflection prompt</button>
+      <div class="section-head" style="padding-top:0">Past entries</div>
+      <div id="journalEntries"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ REVIEW ══════════════════════════════════════════ -->
+<div id="screen-review" class="screen">
+  <div class="topbar">
+    <div><div class="topbar-title">🏆 Weekly Review</div><div class="topbar-sub">Your week, synthesised</div></div>
+  </div>
+  <div class="scroll-area">
+    <div class="review-wrap">
+      <div class="review-stats">
+        <div class="stat-card"><div class="stat-val gold" id="rCaptures">0</div><div class="stat-key">Captures</div></div>
+        <div class="stat-card"><div class="stat-val green" id="rHabits">0</div><div class="stat-key">Habits done</div></div>
+        <div class="stat-card"><div class="stat-val" id="rIntel">0</div><div class="stat-key">Intel entries</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-head-icon">🏆</span><span class="card-head-title">Wins this week</span></div>
+        <div class="card-body" id="winsList">
+          <div style="color:var(--text3);font-size:13px;text-align:center;padding:12px 0">Log things first — Claude will find your wins.</div>
+        </div>
+      </div>
+      <button class="gen-btn" onclick="generateWeeklyReview()">✨ Generate weekly review</button>
+      <div id="reviewOutput" style="display:none" class="card">
+        <div class="card-head"><span class="card-head-icon">✨</span><span class="card-head-title">AI Weekly Review</span></div>
+        <div class="card-body"><div id="reviewText" style="font-size:14px;color:var(--text2);line-height:1.7;font-weight:300"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODULES SCREEN ══════════════════════════════════ -->
+<div id="screen-modules" class="screen">
+  <div class="topbar">
+    <div><div class="topbar-title">All Modules</div><div class="topbar-sub">Life OS</div></div>
+  </div>
+  <div class="scroll-area">
+    <div id="allModulesList" style="padding:16px 20px"></div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS ════════════════════════════════════════ -->
+<div id="screen-settings" class="screen">
+  <div class="topbar">
+    <div><div class="topbar-title">Settings</div><div class="topbar-sub">Your context & preferences</div></div>
+  </div>
+  <div class="scroll-area">
+    <div class="settings-wrap">
+      <div class="settings-section">
+        <div class="settings-section-title">Your Context</div>
+        <input class="ctx-input" id="ctxName"       placeholder="Your name" />
+        <input class="ctx-input" id="ctxProjects"   placeholder="Active projects" />
+        <input class="ctx-input" id="ctxStocks"     placeholder="Stocks watching (e.g. NVDA, GOOGL)" />
+        <input class="ctx-input" id="ctxInterests"  placeholder="Interests (AI, yoga, value investing...)" />
+        <input class="ctx-input" id="ctxHealth"     placeholder="Health context (conditions, medications)" />
+        <input class="ctx-input" id="ctxBriefTopic" placeholder="Daily briefing topic (default: AI)" />
+        <button class="save-btn-full" onclick="saveContext()">Save Context</button>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">AI Providers</div>
+        <div class="settings-row" onclick="navTo('api')">
+          <span class="sr-icon">🔑</span>
+          <div class="sr-info">
+            <div class="sr-label" id="apiSettingsLabel">Manage API keys</div>
+            <div class="sr-sub" id="apiSettingsSub">Configure providers for each module</div>
+          </div>
+          <div class="sr-right">›</div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Habits</div>
+        <div id="settingsHabitsList"></div>
+        <button class="icon-btn" style="width:100%;justify-content:center;margin-top:4px" onclick="openAddHabit()">+ Add habit</button>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Medications</div>
+        <div id="settingsMedsList"></div>
+        <button class="icon-btn" style="width:100%;justify-content:center;margin-top:4px" onclick="openAddMed()">+ Add medication</button>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Data File</div>
+        <div class="settings-row" onclick="openFileLinkModal()" id="settingsFileRow">
+          <span class="sr-icon">📁</span>
+          <div class="sr-info">
+            <div class="sr-label" id="settingsFileLabel">No file linked</div>
+            <div class="sr-sub" id="settingsFileSub">Tap to link a folder in Google Drive — saves data + original files</div>
+          </div>
+          <div class="sr-right">›</div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Security & Data</div>
+        <div class="settings-row" id="installBtn" onclick="promptInstall()" style="display:none;border-color:var(--gold)">
+          <span class="sr-icon">📲</span>
+          <div class="sr-info"><div class="sr-label" style="color:var(--gold)">Install Life OS</div><div class="sr-sub">Add to your home screen</div></div>
+          <div class="sr-right" style="color:var(--gold)">Install</div>
+        </div>
+        <div class="settings-row" onclick="changePIN()">
+          <span class="sr-icon">🔐</span>
+          <div class="sr-info"><div class="sr-label">Change PIN</div><div class="sr-sub">Update your app lock PIN</div></div>
+          <div class="sr-right">›</div>
+        </div>
+        <div class="settings-row" onclick="exportAll()">
+          <span class="sr-icon">📤</span>
+          <div class="sr-info"><div class="sr-label">Export all data</div><div class="sr-sub">Download as JSON</div></div>
+          <div class="sr-right">›</div>
+        </div>
+        <div class="settings-row" onclick="clearAll()">
+          <span class="sr-icon">🗑️</span>
+          <div class="sr-info"><div class="sr-label">Clear all data</div><div class="sr-sub">Cannot be undone</div></div>
+          <div class="sr-right" style="color:var(--red)">›</div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">About</div>
+        <div class="settings-row">
+          <span class="sr-icon">🧠</span>
+          <div class="sr-info"><div class="sr-label">Life OS</div><div class="sr-sub" id="aboutVersion">Loading...</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ API MANAGER ═══════════════════════════════════ -->
+<div id="screen-api" class="screen">
+  <div class="topbar">
+    <div><div class="topbar-title">🔑 AI Providers</div>
+    <div class="topbar-sub">Keys, routing &amp; testing</div></div>
+    <button class="icon-btn" onclick="testAllProviders()">Test all</button>
+  </div>
+  <div class="scroll-area">
+    <div class="api-screen-wrap">
+
+      <!-- Status hero -->
+      <div class="api-hero">
+        <div class="api-hero-title">API Key Manager</div>
+        <div class="api-hero-sub">Keys encrypted with your PIN · never leave your device unencrypted</div>
+        <div class="api-status-row" id="apiStatusRow"></div>
+      </div>
+
+      <!-- Provider cards -->
+      <div class="section-head" style="padding-left:0">Providers</div>
+      <div id="providerCards"></div>
+
+      <!-- Module routing -->
+      <div class="section-head" style="padding-left:0;margin-top:8px">Module routing</div>
+      <div class="module-routing-section" id="moduleRouting"></div>
+
+      <!-- Test -->
+      <div class="section-head" style="padding-left:0;margin-top:8px">Test a provider</div>
+      <div class="api-test-row">
+        <button class="api-test-btn" onclick="testProvider('claude')">🧠 Test Claude</button>
+        <button class="api-test-btn" onclick="testProvider('groq')">⚡ Test Groq</button>
+        <button class="api-test-btn" onclick="testProvider('gemini')">✨ Test Gemini</button>
+      </div>
+      <div class="api-test-row">
+        <button class="api-test-btn" onclick="testProvider('openai')">🤖 Test OpenAI</button>
+        <button class="api-test-btn" onclick="testProvider('perplexity')">🔍 Test Perplexity</button>
+      </div>
+      <div class="api-test-result" id="apiTestResult"></div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ YOGA ════════════════════════════════════════════ -->
+<div id="screen-yoga" class="screen">
+  <div class="topbar">
+    <div><div class="topbar-title">🧘 Yoga Practice</div><div class="topbar-sub">Log your practice</div></div>
+    <button class="icon-btn" onclick="getYogaInsight()">✨ Insight</button>
+  </div>
+  <div class="scroll-area">
+    <div class="yoga-wrap">
+      <div class="yoga-stats">
+        <div class="yoga-stat"><div class="yoga-stat-val" id="yogaTotal">0</div><div class="yoga-stat-key">Sessions</div></div>
+        <div class="yoga-stat"><div class="yoga-stat-val" id="yogaMinutes">0</div><div class="yoga-stat-key">Minutes</div></div>
+        <div class="yoga-stat"><div class="yoga-stat-val" id="yogaStreak">0</div><div class="yoga-stat-key">Streak</div></div>
+      </div>
+
+      <div id="yogaInsightEl"></div>
+
+      <div class="yoga-start-card">
+        <div class="yoga-start-title">Log a session</div>
+        <div class="yoga-start-sub">What did you practice today?</div>
+        <button class="yoga-start-btn" onclick="toggleYogaForm()">+ Log practice</button>
+      </div>
+
+      <!-- Log form -->
+      <div class="yoga-log-form" id="yogaLogForm">
+        <div class="yoga-field">
+          <div class="yoga-field-label">Style</div>
+          <div class="yoga-chips" id="yogaStyleChips">
+            <div class="yoga-chip sel" data-val="Hatha"       onclick="selYogaChip(this,'style')">Hatha</div>
+            <div class="yoga-chip"     data-val="Vinyasa"     onclick="selYogaChip(this,'style')">Vinyasa</div>
+            <div class="yoga-chip"     data-val="Yin"         onclick="selYogaChip(this,'style')">Yin</div>
+            <div class="yoga-chip"     data-val="Restorative" onclick="selYogaChip(this,'style')">Restorative</div>
+            <div class="yoga-chip"     data-val="Pranayama"   onclick="selYogaChip(this,'style')">Pranayama</div>
+            <div class="yoga-chip"     data-val="Meditation"  onclick="selYogaChip(this,'style')">Meditation</div>
+            <div class="yoga-chip"     data-val="Mixed"       onclick="selYogaChip(this,'style')">Mixed</div>
+          </div>
+        </div>
+
+        <div class="yoga-field">
+          <div class="yoga-field-label">Duration</div>
+          <div class="yoga-slider-row">
+            <input type="range" class="yoga-slider" id="yogaDuration" min="10" max="120" step="5" value="45" oninput="document.getElementById('yogaDurationVal').textContent=this.value">
+            <div class="yoga-slider-val" id="yogaDurationVal">45</div>
+            <div style="font-size:12px;color:var(--text3)">min</div>
+          </div>
+        </div>
+
+        <div class="yoga-field">
+          <div class="yoga-field-label">Energy before</div>
+          <div class="yoga-chips" id="yogaEnergyChips">
+            <div class="yoga-chip sel" data-val="low"    onclick="selYogaChip(this,'energy')">Low 😔</div>
+            <div class="yoga-chip"     data-val="medium" onclick="selYogaChip(this,'energy')">Medium 😐</div>
+            <div class="yoga-chip"     data-val="high"   onclick="selYogaChip(this,'energy')">High ⚡</div>
+          </div>
+        </div>
+
+        <div class="yoga-field">
+          <div class="yoga-field-label">How did it feel?</div>
+          <div class="yoga-chips" id="yogaFeelChips">
+            <div class="yoga-chip"     data-val="challenging"  onclick="selYogaChip(this,'feel')">Challenging 💪</div>
+            <div class="yoga-chip sel" data-val="good"         onclick="selYogaChip(this,'feel')">Good 🙂</div>
+            <div class="yoga-chip"     data-val="effortless"   onclick="selYogaChip(this,'feel')">Effortless 🌊</div>
+            <div class="yoga-chip"     data-val="struggled"    onclick="selYogaChip(this,'feel')">Struggled 😤</div>
+          </div>
+        </div>
+
+        <div class="yoga-field">
+          <div class="yoga-field-label">Focus areas / poses (optional)</div>
+          <textarea class="yoga-textarea" id="yogaNotes" placeholder="e.g. backbends, Trikonasana, breathwork, lower back..." rows="2"></textarea>
+        </div>
+
+        <button class="yoga-save-btn" onclick="saveYogaSession()">Save session</button>
+      </div>
+
+      <div class="section-head" style="padding-left:0">Recent sessions</div>
+      <div id="yogaSessions"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BOTTOM NAV ═════════════════════════════════════ -->
+<nav class="bottom-nav">
+  <button class="nav-item active" id="nav-home"    onclick="navTo('home')">    <span class="nav-icon">⌂</span><span class="nav-label">Home</span></button>
+  <button class="nav-item"        id="nav-modules" onclick="navTo('modules')"> <span class="nav-icon">⊞</span><span class="nav-label">Modules</span></button>
+  <button class="nav-item nav-capture"             onclick="openSheet()">      <div class="nav-capture-inner">+</div></button>
+  <button class="nav-item"        id="nav-review"  onclick="navTo('review')">  <span class="nav-icon">◎</span><span class="nav-label">Review</span></button>
+  <button class="nav-item"        id="nav-settings"onclick="navTo('settings')"><span class="nav-icon">◈</span><span class="nav-label">Settings</span></button>
+</nav>
+</div>
+
+<!-- ══ FINANCE TRACKER ══════════════════════════════════ -->
+<div id="screen-finance" class="screen">
+  <div class="topbar">
+    <div class="topbar-left"><div class="topbar-title">💰 Finance</div><div class="topbar-sub">Income, expenses & cashflow</div></div>
+    <div class="topbar-right"><button class="icon-btn" onclick="openFinanceEntry()">＋</button></div>
+  </div>
+  <div class="scroll-area">
+    <div class="fin-wrap">
+      <div class="fin-summary">
+        <div class="fin-stat"><div class="fin-stat-val income" id="finIncome">₹0</div><div class="fin-stat-key">Income</div></div>
+        <div class="fin-stat"><div class="fin-stat-val expense" id="finExpense">₹0</div><div class="fin-stat-key">Expense</div></div>
+        <div class="fin-stat"><div class="fin-stat-val net" id="finNet">₹0</div><div class="fin-stat-key">Net</div></div>
+      </div>
+      <div class="fin-cat-row" id="finCatRow">
+        <div class="fin-cat active" onclick="filterFinance('all',this)">All</div>
+        <div class="fin-cat" onclick="filterFinance('income',this)">Income</div>
+        <div class="fin-cat" onclick="filterFinance('food',this)">🍔 Food</div>
+        <div class="fin-cat" onclick="filterFinance('transport',this)">🚗 Transport</div>
+        <div class="fin-cat" onclick="filterFinance('health',this)">🩺 Health</div>
+        <div class="fin-cat" onclick="filterFinance('shopping',this)">🛍️ Shopping</div>
+        <div class="fin-cat" onclick="filterFinance('utilities',this)">💡 Utilities</div>
+        <div class="fin-cat" onclick="filterFinance('other',this)">📦 Other</div>
+      </div>
+      <div id="finList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ GOAL TRACKER ═════════════════════════════════════ -->
+<div id="screen-goals" class="screen">
+  <div class="topbar">
+    <div class="topbar-left"><div class="topbar-title">🎯 Goals</div><div class="topbar-sub">What you're working towards</div></div>
+    <div class="topbar-right"><button class="icon-btn" onclick="openGoalEntry()">＋</button></div>
+  </div>
+  <div class="scroll-area">
+    <div class="goal-wrap">
+      <div id="goalList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ENERGY TRACKER ═══════════════════════════════════ -->
+<div id="screen-energy" class="screen">
+  <div class="topbar">
+    <div class="topbar-left"><div class="topbar-title">⚡ Energy</div><div class="topbar-sub">Daily energy log</div></div>
+  </div>
+  <div class="scroll-area">
+    <div class="energy-wrap">
+      <div class="energy-log-card">
+        <div class="energy-dial" id="energyDial">😐</div>
+        <div class="energy-label" id="energyLabel">How's your energy right now?</div>
+        <div class="energy-btns">
+          <div class="energy-btn" onclick="logEnergy(1)" title="Very low">😴</div>
+          <div class="energy-btn" onclick="logEnergy(2)" title="Low">😔</div>
+          <div class="energy-btn" onclick="logEnergy(3)" title="Medium">😐</div>
+          <div class="energy-btn" onclick="logEnergy(4)" title="High">😊</div>
+          <div class="energy-btn" onclick="logEnergy(5)" title="Peak">⚡</div>
+        </div>
+      </div>
+      <div class="energy-peak" id="energyPeak" style="display:none">
+        <div class="energy-peak-icon">🏆</div>
+        <div class="energy-peak-info">
+          <div class="energy-peak-label" id="energyPeakLabel">Peak hour</div>
+          <div class="energy-peak-text" id="energyPeakText"></div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:8px">Last 7 days</div>
+      <div class="energy-history" id="energyHistory"></div>
+      <div class="energy-insight" id="energyInsight" style="display:none"></div>
+      <button class="gen-btn" style="margin-top:8px" onclick="analyseEnergy()">✨ Analyse my energy patterns</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CAPTURE SHEET ══════════════════════════════════ -->
+<div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
+<div class="sheet" id="captureSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title" id="sheetTitle">What's on your mind?</div>
+  <div class="sheet-body">
+    <div class="sheet-types" id="sheetTypes"></div>
+    <textarea class="sheet-textarea" id="sheetText" placeholder="Type anything..."></textarea>
+    <button class="sheet-submit" onclick="saveCapture()">Save</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA & FILE SYSTEM
+// ═══════════════════════════════════════════════════════
+const KEYS = {
+  context:'los_context_v2', captures:'los_captures_v2',
+  habits:'los_habits_v2', intel:'intel_feed_v1',
+  stocks:'los_stocks_v2', health:'los_health_v2',
+  journal:'los_journal_v2', meds:'los_meds_v2',
+  briefing:'los_briefing_v2', yoga:'los_yoga_v3',
+  finance:'los_finance_v1', goals:'los_goals_v1', energy:'los_energy_v1'
+};
+const FILE_NAME_KEY  = 'los_file_name_v1';   // last linked folder name (display only)
+const FSA_SUPPORTED  = 'showDirectoryPicker' in window;
+
+let state = {
+  context:  {name:'',projects:'',stocks:'NVDA,GOOGL',interests:'AI agents, value investing, yoga, Sanskrit',health:'',briefTopic:'AI'},
+  captures: [],
+  habits:   [
+    {id:'h1',name:'Yoga practice',icon:'🧘',streak:0,doneToday:false},
+    {id:'h2',name:'Meditation',   icon:'🕉️',streak:0,doneToday:false},
+    {id:'h3',name:'Reading',      icon:'📖',streak:0,doneToday:false},
+  ],
+  intel:[], stocks:[], health:[], journal:[], meds:[], yoga:[],
+  briefing:{date:'',what:'',why:'',topic:''},
+  finance: [],  // {id, date, type:'income'|'expense', amount, desc, category, note}
+  goals:   [],  // {id, title, why, icon, target, unit, current, milestones:[], createdAt, doneAt}
+  energy:  [],  // {id, date, hour, level:1-5, note}
+};
+
+let dirHandle     = null;  // FSA directory handle — lives in memory per session
+let fileHandle    = null;  // kept for compat — points to data.json inside dirHandle
+let isSaving      = false; // debounce flag
+let saveQueued    = false;  // pending save while one is in progress
+let autoSaveTimer = null;
+
+// ── localStorage fallback ────────────────────────────
+function loadFromLS() {
+  Object.keys(KEYS).forEach(k => {
+    try { const r=localStorage.getItem(KEYS[k]); if(r) state[k]=JSON.parse(r); } catch(_){}
+  });
+}
+
+function writeToLS() {
+  Object.keys(KEYS).forEach(k => {
+    try { localStorage.setItem(KEYS[k], JSON.stringify(state[k])); } catch(_){}
+  });
+}
+
+// ── Unified save: localStorage immediately + file async ──
+function save() {
+  writeToLS();          // sync, instant — always safe
+  scheduleFileSave();   // async, silent
+}
+
+function scheduleFileSave() {
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(() => writeToFile(), 800); // debounce 800ms
+}
+
+// ── File write ───────────────────────────────────────
+async function writeToFile() {
+  if (!dirHandle || !cryptoKey) return;
+  if (isSaving) { saveQueued = true; return; }
+  isSaving = true;
+  setFileBar('saving', 'Saving…');
+  try {
+    const enc      = await encryptData(cryptoKey, state);
+    const jsonFH   = await dirHandle.getFileHandle('lifeos-data.json', {create:true});
+    const writable = await jsonFH.createWritable();
+    await writable.write(enc);
+    await writable.close();
+    setFileBar('linked', `🔗 ${dirHandle.name}`);
+    if (saveQueued) { saveQueued = false; isSaving = false; writeToFile(); return; }
+  } catch(e) {
+    console.warn('[LifeOS] File write failed:', e.message);
+    if (e.name === 'NotAllowedError' || e.name === 'SecurityError') {
+      dirHandle = null; fileHandle = null;
+      setFileBar('unlinked', 'Tap to relink folder');
+    } else {
+      setFileBar('error', 'Save failed — tap to retry');
+    }
+  }
+  isSaving = false;
+}
+
+// ── Save a raw file (health doc, etc.) into files/ subfolder ─
+async function saveRawFile(id, base64, mimeType) {
+  if (!dirHandle) return null;
+  try {
+    const ext      = mimeType === 'application/pdf' ? 'pdf'
+                   : mimeType === 'image/png'        ? 'png'
+                   : mimeType === 'image/webp'       ? 'webp' : 'jpg';
+    const filesDir = await dirHandle.getDirectoryHandle('files', {create:true});
+    const fh       = await filesDir.getFileHandle(`${id}.${ext}`, {create:true});
+    const writable = await fh.createWritable();
+    const binary   = atob(base64);
+    const bytes    = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    await writable.write(bytes);
+    await writable.close();
+    return `files/${id}.${ext}`;
+  } catch(e) {
+    console.warn('[LifeOS] Raw file save failed:', e.message);
+    return null;
+  }
+}
+
+// ── Open a stored raw file ───────────────────────────
+async function openRawFile(filePath) {
+  if (!dirHandle || !filePath) return;
+  try {
+    const parts  = filePath.split('/');
+    const subDir = await dirHandle.getDirectoryHandle(parts[0]);
+    const fh     = await subDir.getFileHandle(parts[1]);
+    const file   = await fh.getFile();
+    const url    = URL.createObjectURL(file);
+    window.open(url, '_blank');
+  } catch(e) {
+    showFileToast('Cannot open file — try relinking your folder.');
+  }
+}
+
+// ── File read ────────────────────────────────────────
+async function readFromFile(handle) {
+  const file = await handle.getFile();
+  const text = await file.text();
+  if (!text.trim()) return null;
+  const decrypted = await decryptData(cryptoKey, text);
+  return decrypted;
+}
+
+// ── FSA: Create / choose new file ───────────────────
+async function fsaLinkNew() {
+  closeFileLinkModal();
+  if (!FSA_SUPPORTED) { exportFallback(); return; }
+  try {
+    const handle = await window.showDirectoryPicker({ mode:'readwrite' });
+    dirHandle  = handle;
+    fileHandle = null; // will be created as lifeos-data.json inside dir
+    localStorage.setItem(FILE_NAME_KEY, handle.name);
+    await writeToFile();
+    setFileBar('linked', `🔗 ${handle.name}`);
+    updateSettingsFileRow();
+    showFileToast(`Linked folder "${handle.name}" — auto-saving`);
+  } catch(e) {
+    if (e.name !== 'AbortError') showFileToast('Could not link folder.');
+  }
+}
+
+// ── FSA: Open existing folder ────────────────────────
+async function fsaOpenExisting() {
+  closeFileLinkModal();
+  if (!FSA_SUPPORTED) {
+    document.getElementById('fileInputImport').click();
+    return;
+  }
+  try {
+    const handle = await window.showDirectoryPicker({ mode:'readwrite' });
+    // Try to read lifeos-data.json from it
+    let loaded = null;
+    try {
+      const jsonFH = await handle.getFileHandle('lifeos-data.json');
+      loaded = await readFromFile(jsonFH);
+    } catch(_) {}
+
+    if (loaded) {
+      const localHabits = state.habits;
+      Object.assign(state, loaded);
+      if (localHabits.length === state.habits.length) {
+        state.habits.forEach((h,i) => { h.doneToday = localHabits[i]?.doneToday ?? h.doneToday; });
+      }
+      writeToLS();
+    }
+    dirHandle  = handle;
+    fileHandle = null;
+    localStorage.setItem(FILE_NAME_KEY, handle.name);
+    setFileBar('linked', `🔗 ${handle.name}`);
+    updateSettingsFileRow();
+    showFileToast(`Linked "${handle.name}"${loaded ? ' — data restored' : ' — new folder'}`);
+    refreshHome(); renderHabits();
+  } catch(e) {
+    if (e.name !== 'AbortError') showFileToast('Could not open folder.');
+  }
+}
+
+// ── Import from JSON (fallback for non-FSA browsers) ──
+async function handleImport(input) {
+  const file = input.files[0]; if (!file) return;
+  input.value = '';
+  closeFileLinkModal();
+  const reader = new FileReader();
+  reader.onload = async ev => {
+    try {
+      let data;
+      try {
+        // Try encrypted first (if PIN is set)
+        if (cryptoKey) data = await decryptData(cryptoKey, ev.target.result);
+      } catch(_) {}
+      if (!data) {
+        // Try plain JSON
+        data = JSON.parse(ev.target.result);
+      }
+      if (!data || typeof data !== 'object') throw new Error('Invalid file');
+      Object.assign(state, data);
+      writeToLS();
+      showFileToast(`Imported from ${file.name}`);
+      refreshHome(); renderHabits();
+    } catch(e) {
+      showFileToast('Import failed — wrong file or wrong PIN.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ── Export fallback (download) ───────────────────────
+async function exportFallback() {
+  closeFileLinkModal();
+  let content;
+  if (cryptoKey) {
+    content = await encryptData(cryptoKey, state);
+  } else {
+    content = JSON.stringify({exported:new Date().toISOString(),version:'1.0',...state}, null, 2);
+  }
+  const blob = new Blob([content], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `lifeos_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  showFileToast('Exported — save this file safely');
+}
+
+// ── File bar UI ──────────────────────────────────────
+let fileBarTimer = null;
+
+function setFileBar(state, text) {
+  const bar   = document.getElementById('fileBar');
+  const label = document.getElementById('fileBarText');
+  bar.className = '';
+  bar.classList.add(state);
+  label.textContent = text;
+  clearTimeout(fileBarTimer);
+  // linked: stays visible; saving: fades after 2s; others: stay
+  if (state === 'saving') {
+    fileBarTimer = setTimeout(() => {
+      if (dirHandle) setFileBar('linked', `🔗 ${dirHandle.name}`);
+    }, 2000);
+  }
+}
+
+function showFileToast(msg) {
+  const label = document.getElementById('fileBarText');
+  const bar   = document.getElementById('fileBar');
+  label.textContent = msg;
+  bar.className = 'linked';
+  clearTimeout(fileBarTimer);
+  fileBarTimer = setTimeout(() => {
+    if (dirHandle) setFileBar('linked', `🔗 ${dirHandle.name}`);
+    else setFileBar('unlinked', 'Tap to link a folder');
+  }, 3000);
+}
+
+function updateSettingsFileRow() {
+  const label = document.getElementById('settingsFileLabel');
+  const sub   = document.getElementById('settingsFileSub');
+  if (!label || !sub) return;
+  if (dirHandle) {
+    label.textContent = `🔗 ${dirHandle.name}`;
+    label.style.color = 'var(--green)';
+    sub.textContent   = 'Auto-saving every change · tap to manage';
+  } else {
+    label.textContent = 'No folder linked';
+    label.style.color = '';
+    sub.textContent   = 'Tap to link a folder in Google Drive — saves data.json + original files';
+  }
+}
+
+// ── File link modal ──────────────────────────────────
+function openFileLinkModal() {
+  // Update sub-text to reflect current state
+  const sub = document.getElementById('flmSub');
+  if (dirHandle) {
+    sub.textContent = `Currently linked: ${dirHandle.name}. Choose an option below.`;
+    document.getElementById('flmLinkNew').querySelector('.flm-opt-label').textContent = 'Link a different folder';
+    document.getElementById('flmOpenExisting').querySelector('.flm-opt-label').textContent = 'Relink same folder';
+  } else {
+    sub.textContent = 'Link a JSON file so your data persists permanently — even if browser cache clears. Store it in Google Drive for automatic cloud backup.';
+    document.getElementById('flmLinkNew').querySelector('.flm-opt-label').textContent = 'Choose a folder';
+    document.getElementById('flmOpenExisting').querySelector('.flm-opt-label').textContent = 'Relink existing folder';
+  }
+  // Hide FSA options on unsupported browsers, show export instead
+  const fsaNote = FSA_SUPPORTED ? '' : ' (tap Export below — file linking requires desktop Chrome or Chrome on Android 12+)';
+  if (!FSA_SUPPORTED) sub.textContent += fsaNote;
+  document.getElementById('fileLinkModal').classList.add('open');
+}
+
+function closeFileLinkModal() {
+  document.getElementById('fileLinkModal').classList.remove('open');
+}
+
+// Close modal on backdrop click
+document.getElementById('fileLinkModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('fileLinkModal')) closeFileLinkModal();
+});
+
+// ── Init file state on startup ───────────────────────
+function initFileBar() {
+  const lastName = localStorage.getItem(FILE_NAME_KEY);
+  if (lastName) {
+    setFileBar('unlinked', `Tap to relink: ${lastName}`);
+  } else {
+    setFileBar('unlinked', 'Tap to link a folder');
+  }
+}
+
+function getContext() {
+  const c = state.context;
+  return `User context:
+Name: ${c.name||'User'}
+Projects: ${c.projects||'not specified'}
+Stocks watching: ${c.stocks||'not specified'}
+Interests: ${c.interests||'not specified'}
+Health context: ${c.health||'not specified'}
+Daily briefing topic: ${c.briefTopic||'AI'}`;
+}
+
+// ═══════════════════════════════════════════════════════
+// API MANAGER
+// ═══════════════════════════════════════════════════════
+const API_KEYS_LS = 'los_api_keys_v1';      // encrypted blob in localStorage
+const API_ROUTING_LS = 'los_api_routing_v1'; // plain JSON — not sensitive
+
+// In-memory after unlock — never written to disk unencrypted
+let apiKeys = {
+  claude:     '',
+  groq:       '',
+  gemini:     '',
+  openai:     '',
+  perplexity: ''
+};
+
+// Per-module provider routing — user configurable
+let moduleRouting = {
+  intel:    'claude',
+  stocks:   'claude',
+  health:   'claude',
+  briefing: 'claude',
+  review:   'claude',
+  journal:  'claude',
+  yoga:     'auto',    // local if available, else groq
+  habits:   'auto',    // local if available, else groq
+  finance:  'auto',    // local for categorisation — simple task
+  goals:    'claude',  // reasoning + coaching
+  energy:   'auto',    // local for pattern analysis
+};
+
+// Provider definitions
+// ═══════════════════════════════════════════════════════
+// UNIFIED AI PROVIDER LAYER  v2.0
+// Cloud providers + Local on-device models
+// All AI calls go through callAI(module, prompt, opts)
+// ═══════════════════════════════════════════════════════
+
+// ── Local provider state ──────────────────────────────
+let localProviderStatus = {}; // { providerName: true|false }
+
+// ── Provider registry ─────────────────────────────────
+const PROVIDERS = {
+
+  // ── CLOUD PROVIDERS ────────────────────────────────
+
+  claude: {
+    name:      'claude',
+    label:     'Claude',
+    subtitle:  'claude-sonnet-4-20250514',
+    icon:      '🧠',
+    type:      'cloud',
+    strengths: ['Deep reasoning','Documents & PDFs','Long synthesis','Web search'],
+    hasSearch: true,
+    hasVision: true,
+    hasAudio:  false,
+    costTier:  'medium',
+    keyPrefix: 'sk-ant-',
+    keyLink:   'https://console.anthropic.com/settings/keys',
+    keyHint:   'Get your key from console.anthropic.com',
+    call: async (key, prompt, opts={}) => {
+      const body = {
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: opts.maxTokens || 1000,
+        messages: [{ role:'user', content: opts.images || prompt }]
+      };
+      if (opts.system) body.system = opts.system;
+      if (opts.search) body.tools = [{ type:'web_search_20250305', name:'web_search' }];
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'x-api-key': key,
+          'anthropic-version':'2023-06-01',
+          'anthropic-dangerous-direct-browser-access':'true'
+        },
+        body: JSON.stringify(body)
+      });
+      const d = await res.json();
+      if (d.error) throw new Error(d.error.message);
+      return d.content?.filter(b=>b.type==='text').map(b=>b.text).join('') || '';
+    }
+  },
+
+  groq: {
+    name:      'groq',
+    label:     'Groq',
+    subtitle:  'Llama 3.3 70B — fastest inference',
+    icon:      '⚡',
+    type:      'cloud',
+    strengths: ['Fastest responses','Free tier','Simple tasks','Low cost'],
+    hasSearch: false,
+    hasVision: false,
+    hasAudio:  false,
+    costTier:  'free',
+    keyPrefix: 'gsk_',
+    keyLink:   'https://console.groq.com/keys',
+    keyHint:   'Free tier at console.groq.com',
+    call: async (key, prompt, opts={}) => {
+      const messages = [];
+      if (opts.system) messages.push({ role:'system', content: opts.system });
+      messages.push({ role:'user', content: prompt });
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method:'POST',
+        headers:{ 'Authorization':`Bearer ${key}`, 'Content-Type':'application/json' },
+        body: JSON.stringify({ model:'llama-3.3-70b-versatile', messages, max_tokens: opts.maxTokens||800 })
+      });
+      const d = await res.json();
+      if (d.error) throw new Error(d.error.message || JSON.stringify(d.error));
+      return d.choices?.[0]?.message?.content || '';
+    }
+  },
+
+  gemini: {
+    name:      'gemini',
+    label:     'Gemini',
+    subtitle:  'Gemini 2.0 Flash — fast & multimodal',
+    icon:      '✨',
+    type:      'cloud',
+    strengths: ['Very fast','Google Search','Long context','Multimodal'],
+    hasSearch: true,
+    hasVision: true,
+    hasAudio:  false,
+    costTier:  'low',
+    keyPrefix: 'AIza',
+    keyLink:   'https://aistudio.google.com/app/apikey',
+    keyHint:   'Free tier at aistudio.google.com',
+    call: async (key, prompt, opts={}) => {
+      const parts = [{ text: (opts.system ? opts.system + '\n\n' : '') + prompt }];
+      if (opts.images) {
+        // Gemini vision: inline image data
+        const imgBlock = opts.images.find(b => b.type==='image'||b.type==='document');
+        if (imgBlock?.source?.data) {
+          parts.unshift({ inline_data: { mime_type: imgBlock.source.media_type, data: imgBlock.source.data } });
+        }
+      }
+      const body = { contents:[{ parts }] };
+      if (opts.search) body.tools = [{ google_search: {} }];
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+        { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) }
+      );
+      const d = await res.json();
+      if (d.error) throw new Error(d.error.message);
+      return d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    }
+  },
+
+  openai: {
+    name:      'openai',
+    label:     'OpenAI',
+    subtitle:  'GPT-4o mini — capable & affordable',
+    icon:      '🤖',
+    type:      'cloud',
+    strengths: ['Strong vision','Wide capability','Reliable','Good JSON output'],
+    hasSearch: false,
+    hasVision: true,
+    hasAudio:  false,
+    costTier:  'low',
+    keyPrefix: 'sk-',
+    keyLink:   'https://platform.openai.com/api-keys',
+    keyHint:   'Get your key from platform.openai.com',
+    call: async (key, prompt, opts={}) => {
+      const messages = [];
+      if (opts.system) messages.push({ role:'system', content: opts.system });
+      if (opts.images) {
+        const imgBlock = opts.images.find(b => b.type==='image'||b.type==='document');
+        const content = imgBlock?.source?.data
+          ? [
+              { type:'image_url', image_url:{ url:`data:${imgBlock.source.media_type};base64,${imgBlock.source.data}` } },
+              { type:'text', text: prompt }
+            ]
+          : prompt;
+        messages.push({ role:'user', content });
+      } else {
+        messages.push({ role:'user', content: prompt });
+      }
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method:'POST',
+        headers:{ 'Authorization':`Bearer ${key}`, 'Content-Type':'application/json' },
+        body: JSON.stringify({ model:'gpt-4o-mini', messages, max_tokens: opts.maxTokens||800 })
+      });
+      const d = await res.json();
+      if (d.error) throw new Error(d.error.message);
+      return d.choices?.[0]?.message?.content || '';
+    }
+  },
+
+  perplexity: {
+    name:      'perplexity',
+    label:     'Perplexity',
+    subtitle:  'sonar-pro — real-time web search',
+    icon:      '🔍',
+    type:      'cloud',
+    strengths: ['Real-time web search','Current news','Source citations','Fast search'],
+    hasSearch: true,
+    hasVision: false,
+    hasAudio:  false,
+    costTier:  'low',
+    keyPrefix: 'pplx-',
+    keyLink:   'https://www.perplexity.ai/settings/api',
+    keyHint:   'Get your key from perplexity.ai/settings/api',
+    call: async (key, prompt, opts={}) => {
+      const messages = [];
+      if (opts.system) messages.push({ role:'system', content: opts.system });
+      messages.push({ role:'user', content: prompt });
+      const res = await fetch('https://api.perplexity.ai/chat/completions', {
+        method:'POST',
+        headers:{ 'Authorization':`Bearer ${key}`, 'Content-Type':'application/json' },
+        body: JSON.stringify({ model:'sonar-pro', messages, max_tokens: opts.maxTokens||800 })
+      });
+      const d = await res.json();
+      if (d.error) throw new Error(typeof d.error==='string' ? d.error : JSON.stringify(d.error));
+      return d.choices?.[0]?.message?.content || '';
+    }
+  },
+
+  // ── LOCAL / ON-DEVICE PROVIDERS ────────────────────
+  // These run via Ollama-compatible HTTP API on the device
+  // AI Edge Gallery, Ollama, LM Studio, Jan all expose this format
+  // Default port 11434 — user can configure a custom URL
+
+  gemma_local: {
+    name:      'gemma_local',
+    label:     'Gemma 4 (local)',
+    subtitle:  'E2B/E4B — on-device, fully private',
+    icon:      '📱',
+    type:      'local',
+    strengths: ['Fully private','No API cost','Works offline','Fast on-device'],
+    hasSearch: false,
+    hasVision: true,   // E2B/E4B support vision
+    hasAudio:  true,   // E2B/E4B support audio
+    costTier:  'free',
+    keyPrefix: null,   // No key needed
+    keyLink:   'https://developers.googleblog.com/bring-state-of-the-art-agentic-skills-to-the-edge-with-gemma-4/',
+    keyHint:   'Runs via AI Edge Gallery or Ollama on your device. No key needed.',
+    modelName: 'gemma4:2b', // Ollama model tag — user can change
+    call: async (key, prompt, opts={}) => {
+      const endpoint = apiKeys['gemma_local_url'] || 'http://localhost:11434';
+      const messages = [];
+      if (opts.system) messages.push({ role:'system', content: opts.system });
+
+      // Vision: Ollama supports base64 images in content array
+      if (opts.images) {
+        const imgBlock = opts.images.find(b => b.type==='image'||b.type==='document');
+        if (imgBlock?.source?.data) {
+          messages.push({
+            role: 'user',
+            content: [
+              { type:'image_url', image_url:{ url:`data:${imgBlock.source.media_type};base64,${imgBlock.source.data}` } },
+              { type:'text', text: prompt }
+            ]
+          });
+        } else {
+          messages.push({ role:'user', content: prompt });
+        }
+      } else {
+        messages.push({ role:'user', content: prompt });
+      }
+
+      const modelName = apiKeys['gemma_local_model'] || 'gemma4:2b';
+      const res = await fetch(`${endpoint}/v1/chat/completions`, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({ model:modelName, messages, max_tokens: opts.maxTokens||800, stream:false })
+      });
+      if (!res.ok) throw new Error(`Local model error: ${res.status} — is Ollama/AI Edge running?`);
+      const d = await res.json();
+      return d.choices?.[0]?.message?.content || '';
+    }
+  },
+
+  openai_compat: {
+    name:      'openai_compat',
+    label:     'Local (OpenAI-compatible)',
+    subtitle:  'Any local model — Ollama, LM Studio, Jan',
+    icon:      '🖥️',
+    type:      'local',
+    strengths: ['Any local model','Fully private','No cost','Configurable endpoint'],
+    hasSearch: false,
+    hasVision: false, // depends on model
+    hasAudio:  false,
+    costTier:  'free',
+    keyPrefix: null,
+    keyLink:   'https://ollama.com',
+    keyHint:   'Set your local server URL and model name below. Works with Ollama, LM Studio, Jan.',
+    call: async (key, prompt, opts={}) => {
+      const endpoint  = apiKeys['openai_compat_url']   || 'http://localhost:11434';
+      const modelName = apiKeys['openai_compat_model'] || 'llama3.2';
+      const messages  = [];
+      if (opts.system) messages.push({ role:'system', content: opts.system });
+      messages.push({ role:'user', content: prompt });
+      const res = await fetch(`${endpoint}/v1/chat/completions`, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({ model:modelName, messages, max_tokens: opts.maxTokens||800, stream:false })
+      });
+      if (!res.ok) throw new Error(`Local model error: ${res.status} — is the server running at ${endpoint}?`);
+      const d = await res.json();
+      return d.choices?.[0]?.message?.content || '';
+    }
+  }
+};
+
+// ── Local provider reachability check ────────────────
+async function pingLocalProvider(name) {
+  const provider = PROVIDERS[name];
+  if (!provider || provider.type !== 'local') return false;
+  try {
+    const endpoint = apiKeys[`${name}_url`] || 'http://localhost:11434';
+    const res = await fetch(`${endpoint}/api/tags`, {
+      method:'GET',
+      signal: AbortSignal.timeout(2000)  // 2s timeout
+    });
+    localProviderStatus[name] = res.ok;
+    return res.ok;
+  } catch {
+    localProviderStatus[name] = false;
+    return false;
+  }
+}
+
+async function pingAllLocalProviders() {
+  const localNames = Object.keys(PROVIDERS).filter(k => PROVIDERS[k].type === 'local');
+  await Promise.all(localNames.map(pingLocalProvider));
+  // Re-render API manager if open
+  if (document.getElementById('screen-api')?.classList.contains('active')) {
+    renderApiStatusRow();
+    renderProviderCards();
+  }
+}
+
+// ── Check if a provider is usable ────────────────────
+function isProviderAvailable(name) {
+  const p = PROVIDERS[name];
+  if (!p) return false;
+  if (p.type === 'local') return localProviderStatus[name] === true;
+  if (p.type === 'cloud') return !!(apiKeys[name]);
+  return false;
+}
+
+// ── Unified AI call ───────────────────────────────────
+async function callAI(module, prompt, opts={}) {
+  // Build priority chain:
+  // 1. Explicit override in opts
+  // 2. Module routing config
+  // 3. Auto-select: prefer local if available and capable
+  // 4. Any available provider as fallback
+  // 5. Error
+
+  let providerName = opts.provider || moduleRouting[module];
+
+  // If routing says 'auto', pick the best available
+  if (!providerName || providerName === 'auto') {
+    providerName = autoSelectProvider(opts);
+  }
+
+  // Try the selected provider, with fallback
+  const tried = new Set();
+  let lastError;
+
+  const tryProvider = async (name) => {
+    if (tried.has(name)) return null;
+    tried.add(name);
+    const p = PROVIDERS[name];
+    if (!p) return null;
+    if (p.type === 'local' && !localProviderStatus[name]) return null;
+    if (p.type === 'cloud' && !apiKeys[name]) return null;
+    if (opts.search && !p.hasSearch) return null;
+    if (opts.images && !p.hasVision) return null;
+    try {
+      return await p.call(apiKeys[name] || '', prompt, opts);
+    } catch(e) {
+      lastError = e;
+      console.warn(`[callAI] ${name} failed:`, e.message);
+      return null;
+    }
+  };
+
+  // Try primary
+  let result = await tryProvider(providerName);
+  if (result !== null) return result;
+
+  // Fallback: try other available providers in order
+  // Local first (free, private), then cloud
+  const fallbackOrder = [
+    ...Object.keys(PROVIDERS).filter(k => PROVIDERS[k].type==='local' && isProviderAvailable(k)),
+    ...Object.keys(PROVIDERS).filter(k => PROVIDERS[k].type==='cloud' && isProviderAvailable(k))
+  ];
+
+  for (const name of fallbackOrder) {
+    result = await tryProvider(name);
+    if (result !== null) return result;
+  }
+
+  // Nothing worked
+  throw lastError || new Error('No AI providers available. Add an API key in Settings → AI Providers, or start your local model server.');
+}
+
+// ── Auto-select the best provider for a task ──────────
+function autoSelectProvider(opts={}) {
+  // Local available + task doesn't need search → prefer local
+  if (!opts.search) {
+    const localAvail = Object.keys(PROVIDERS)
+      .filter(k => PROVIDERS[k].type==='local' && isProviderAvailable(k));
+    if (localAvail.length) {
+      // If vision needed, pick one that supports it
+      if (opts.images) {
+        const visionLocal = localAvail.find(k => PROVIDERS[k].hasVision);
+        if (visionLocal) return visionLocal;
+      } else {
+        return localAvail[0];
+      }
+    }
+  }
+  // Cloud fallback
+  if (opts.search) {
+    const searchCloud = ['claude','gemini','perplexity'].find(k => apiKeys[k]);
+    if (searchCloud) return searchCloud;
+  }
+  const anyCloud = Object.keys(PROVIDERS)
+    .filter(k => PROVIDERS[k].type==='cloud' && apiKeys[k]);
+  return anyCloud[0] || 'claude';
+}
+
+
+// ── Key storage (encrypted with PIN key) ─────────────
+async function saveApiKeys() {
+  if (!cryptoKey) {
+    // No PIN key yet — store plain (will be encrypted after PIN setup)
+    localStorage.setItem(API_KEYS_LS, JSON.stringify(apiKeys));
+    return;
+  }
+  try {
+    const enc = await encryptData(cryptoKey, apiKeys);
+    localStorage.setItem(API_KEYS_LS, enc);
+  } catch(e) {
+    console.error('API key save failed', e);
+  }
+}
+
+async function loadApiKeys() {
+  const stored = localStorage.getItem(API_KEYS_LS);
+  if (!stored) return;
+  try {
+    if (cryptoKey) {
+      // Try decrypting
+      try {
+        const dec = await decryptData(cryptoKey, stored);
+        Object.assign(apiKeys, dec);
+        return;
+      } catch(_) {}
+    }
+    // Fallback: plain JSON (pre-encryption or no PIN)
+    const parsed = JSON.parse(stored);
+    Object.assign(apiKeys, parsed);
+  } catch(_) {}
+}
+
+function saveRouting() {
+  localStorage.setItem(API_ROUTING_LS, JSON.stringify(moduleRouting));
+}
+
+function loadRouting() {
+  try {
+    const s = localStorage.getItem(API_ROUTING_LS);
+    if (s) Object.assign(moduleRouting, JSON.parse(s));
+  } catch(_) {}
+}
+
+// ── Render API Manager screen ─────────────────────────
+function renderApiManager() {
+  renderApiStatusRow();
+  renderProviderCards();
+  renderModuleRouting();
+  updateApiSettingsLabel();
+}
+
+function renderApiStatusRow() {
+  const row = document.getElementById('apiStatusRow');
+  row.innerHTML = Object.values(PROVIDERS).map(p => {
+    const isAvail = isProviderAvailable(p.name);
+    const isLocal = p.type === 'local';
+    const label   = isLocal
+      ? (localProviderStatus[p.name] === true  ? 'active'
+       : localProviderStatus[p.name] === false ? 'inactive' : 'inactive')
+      : (apiKeys[p.name] ? 'active' : 'inactive');
+    return `<div class="api-pill ${label}">
+      <div class="api-pill-dot"></div>
+      ${p.icon} ${p.label}${isLocal ? ' 📱' : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderProviderCards() {
+  const el = document.getElementById('providerCards');
+
+  const cloudProviders = Object.values(PROVIDERS).filter(p => p.type === 'cloud');
+  const localProviders = Object.values(PROVIDERS).filter(p => p.type === 'local');
+
+  const renderCard = (p) => {
+    const isLocal  = p.type === 'local';
+    const hasKey   = !isLocal && !!apiKeys[p.name];
+    const isOnline = isLocal && localProviderStatus[p.name] === true;
+    const isTested = isLocal && localProviderStatus[p.name] !== undefined;
+    const masked   = hasKey ? maskKey(apiKeys[p.name]) : '';
+
+    const statusLabel = isLocal
+      ? (isTested ? (isOnline ? '✓ Running' : '✗ Offline') : 'Not tested')
+      : (hasKey ? '✓ Set' : 'Not set');
+    const statusClass = isLocal
+      ? (isOnline ? 'set' : 'unset')
+      : (hasKey   ? 'set' : 'unset');
+    const cardClass = (hasKey || isOnline) ? 'has-key' : '';
+
+    const localEndpointKey = `${p.name}_url`;
+    const localModelKey    = `${p.name}_model`;
+    const currentEndpoint  = apiKeys[localEndpointKey] || 'http://localhost:11434';
+    const currentModel     = apiKeys[localModelKey]    || p.modelName || '';
+
+    return `
+    <div class="provider-card ${cardClass}" id="pcard_${p.name}">
+      <div class="pc-head" onclick="toggleProviderCard('${p.name}')">
+        <div class="pc-icon">${p.icon}</div>
+        <div class="pc-info">
+          <div class="pc-name">${p.label} ${isLocal ? '<span style="font-size:10px;color:var(--teal);background:var(--teal-dim);padding:2px 6px;border-radius:4px;margin-left:4px">on-device</span>' : ''}</div>
+          <div class="pc-desc">${p.subtitle}</div>
+        </div>
+        <div class="pc-status ${statusClass}">${statusLabel}</div>
+      </div>
+      <div class="pc-body" id="pbody_${p.name}">
+        <div class="pc-strengths">
+          ${p.strengths.map(s => `<span class="pc-strength">${s}</span>`).join('')}
+        </div>
+        <div class="pc-key-hint">${p.keyHint}${!isLocal ? ` · <a class="pc-key-link" href="${p.keyLink}" target="_blank">Get key ↗</a>` : ''}</div>
+
+        ${isLocal ? `
+        <div style="margin-bottom:8px">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Server URL</div>
+          <div class="pc-key-row">
+            <input class="pc-key-input" id="url_${p.name}" type="text"
+              value="${currentEndpoint}"
+              placeholder="http://localhost:11434"
+              autocomplete="off" style="font-size:12px">
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin:8px 0 4px">Model name</div>
+          <div class="pc-key-row">
+            <input class="pc-key-input" id="model_${p.name}" type="text"
+              value="${currentModel}"
+              placeholder="${p.modelName || 'e.g. gemma4:2b'}"
+              autocomplete="off" style="font-size:12px">
+            <button class="pc-save-btn" onclick="saveLocalConfig('${p.name}')">Save</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <button class="pc-save-btn" style="flex:1" onclick="pingAndShow('${p.name}')">🔍 Test connection</button>
+          <button class="pc-clear-btn" onclick="setModuleProvider('yoga','${p.name}');renderModuleRouting()">Use for yoga</button>
+        </div>
+        <div id="localStatus_${p.name}" style="font-size:11px;margin-top:6px;min-height:16px"></div>
+        ` : `
+        <div class="pc-key-row">
+          <input class="pc-key-input" id="keyinput_${p.name}"
+            type="password"
+            placeholder="${hasKey ? masked : 'Paste your API key...'}"
+            autocomplete="off" autocorrect="off" spellcheck="false">
+          <button class="pc-save-btn" onclick="saveProviderKey('${p.name}')">Save</button>
+        </div>
+        ${hasKey ? `<div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+          <div style="font-size:11px;color:var(--text3);flex:1">${masked}</div>
+          <button class="pc-clear-btn" onclick="clearProviderKey('${p.name}')">Remove</button>
+        </div>` : ''}
+        `}
+
+        ${p.hasSearch ? `<div style="font-size:11px;color:var(--blue);margin-top:6px">✓ Web search</div>` : ''}
+        ${p.hasVision ? `<div style="font-size:11px;color:var(--blue)">✓ Images & PDFs</div>` : ''}
+        ${p.hasAudio  ? `<div style="font-size:11px;color:var(--blue)">✓ Audio / voice</div>` : ''}
+      </div>
+    </div>`;
+  };
+
+  el.innerHTML =
+    `<div style="font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;font-weight:500">☁️ Cloud providers</div>` +
+    cloudProviders.map(renderCard).join('') +
+    `<div style="font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin:16px 0 8px;font-weight:500">📱 Local / on-device</div>` +
+    `<div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.5">Runs on your phone via Ollama or AI Edge Gallery. No cost, fully private, works offline.</div>` +
+    localProviders.map(renderCard).join('');
+}
+
+async function saveLocalConfig(name) {
+  const urlInput   = document.getElementById(`url_${name}`);
+  const modelInput = document.getElementById(`model_${name}`);
+  if (urlInput)   apiKeys[`${name}_url`]   = urlInput.value.trim();
+  if (modelInput) apiKeys[`${name}_model`] = modelInput.value.trim();
+  await saveApiKeys();
+  showKeyMsg(name, '✓ Config saved');
+  // Immediately test
+  await pingAndShow(name);
+}
+
+async function pingAndShow(name) {
+  const statusEl = document.getElementById(`localStatus_${name}`);
+  const card     = document.getElementById(`pcard_${name}`);
+  if (statusEl) statusEl.textContent = '⏳ Testing connection...';
+  const ok = await pingLocalProvider(name);
+  if (statusEl) {
+    statusEl.textContent = ok
+      ? `✓ Connected — model: ${apiKeys[`${name}_model`] || PROVIDERS[name]?.modelName || 'auto'}`
+      : `✗ Not reachable at ${apiKeys[`${name}_url`] || 'http://localhost:11434'} — is the server running?`;
+    statusEl.style.color = ok ? 'var(--green)' : 'var(--red)';
+  }
+  if (card) card.classList.toggle('has-key', ok);
+  // Update status badge
+  const badge = card?.querySelector('.pc-status');
+  if (badge) {
+    badge.textContent = ok ? '✓ Running' : '✗ Offline';
+    badge.className   = `pc-status ${ok ? 'set' : 'unset'}`;
+  }
+  renderApiStatusRow();
+  updateApiSettingsLabel();
+}
+
+
+function toggleProviderCard(name) {
+  const body = document.getElementById('pbody_' + name);
+  const isOpen = body.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.pc-body').forEach(b => b.classList.remove('open'));
+  if (!isOpen) body.classList.add('open');
+}
+
+async function saveProviderKey(name) {
+  const input = document.getElementById('keyinput_' + name);
+  const val = input.value.trim();
+  if (!val) { showKeyMsg(name, 'Paste a key first'); return; }
+  apiKeys[name] = val;
+  await saveApiKeys();
+  input.value = '';
+  renderProviderCards();
+  renderApiStatusRow();
+  updateApiSettingsLabel();
+  // Reopen the card to show confirmation
+  toggleProviderCard(name);
+  showKeyMsg(name, '✓ Saved');
+}
+
+async function clearProviderKey(name) {
+  if (!confirm(`Remove ${PROVIDERS[name].label} key?`)) return;
+  apiKeys[name] = '';
+  await saveApiKeys();
+  renderProviderCards();
+  renderApiStatusRow();
+  updateApiSettingsLabel();
+}
+
+function showKeyMsg(name, msg) {
+  const body = document.getElementById('pbody_' + name);
+  if (!body) return;
+  const div = document.createElement('div');
+  div.style.cssText = 'font-size:11px;color:var(--green);margin-top:6px;animation:popIn .2s ease';
+  div.textContent = msg;
+  body.appendChild(div);
+  setTimeout(() => div.remove(), 2500);
+}
+
+function maskKey(key) {
+  if (!key || key.length < 8) return '••••••••';
+  return key.slice(0, 6) + '••••••••••••' + key.slice(-4);
+}
+
+function renderModuleRouting() {
+  const el = document.getElementById('moduleRouting');
+  const modules = [
+    { id:'intel',    icon:'📡', name:'Intel Feed' },
+    { id:'stocks',   icon:'📈', name:'Stock Scanner' },
+    { id:'health',   icon:'🩺', name:'Health' },
+    { id:'briefing', icon:'🌐', name:'Daily Briefing' },
+    { id:'review',   icon:'🏆', name:'Weekly Review' },
+    { id:'journal',  icon:'📓', name:'Journal' },
+    { id:'yoga',     icon:'🧘', name:'Yoga' },
+    { id:'habits',   icon:'✅', name:'Habits coaching' },
+    { id:'finance',  icon:'💰', name:'Finance' },
+    { id:'goals',    icon:'🎯', name:'Goal Tracker' },
+  ];
+
+  const options = Object.values(PROVIDERS).map(p =>
+    `<option value="${p.name}" ${!apiKeys[p.name] ? 'disabled' : ''}>${p.icon} ${p.label}${!apiKeys[p.name] ? ' (no key)' : ''}</option>`
+  ).join('');
+
+  el.innerHTML = modules.map(m => `
+    <div class="routing-row">
+      <div class="routing-icon">${m.icon}</div>
+      <div class="routing-name">${m.name}</div>
+      <select class="routing-select" onchange="setModuleProvider('${m.id}',this.value)">
+        ${Object.values(PROVIDERS).map(p =>
+          `<option value="${p.name}"
+            ${moduleRouting[m.id] === p.name ? 'selected' : ''}
+            ${!apiKeys[p.name] ? 'disabled' : ''}>
+            ${p.icon} ${p.label}${!apiKeys[p.name] ? ' (no key)' : ''}
+          </option>`
+        ).join('')}
+      </select>
+    </div>`).join('');
+}
+
+function setModuleProvider(module, provider) {
+  moduleRouting[module] = provider;
+  saveRouting();
+}
+
+// ── Test provider ─────────────────────────────────────
+async function testProvider(name) {
+  const result = document.getElementById('apiTestResult');
+  const provider = PROVIDERS[name];
+  const key = apiKeys[name];
+
+  if (!key) {
+    result.textContent = `✗ No key for ${provider.label} — add one above`;
+    result.className = 'api-test-result fail';
+    result.style.display = 'block';
+    return;
+  }
+
+  result.textContent = `Testing ${provider.icon} ${provider.label}...`;
+  result.className = 'api-test-result';
+  result.style.display = 'block';
+
+  try {
+    const start = Date.now();
+    const text = await provider.call(key, 'Reply with exactly: "Life OS connected ✓"', { maxTokens: 20 });
+    const ms = Date.now() - start;
+    result.textContent = `✓ ${provider.label} connected · ${ms}ms · "${text.trim()}"`;
+    result.className = 'api-test-result ok';
+  } catch(err) {
+    result.textContent = `✗ ${provider.label} failed: ${err.message}`;
+    result.className = 'api-test-result fail';
+  }
+}
+
+async function testAllProviders() {
+  const result = document.getElementById('apiTestResult');
+  const configured = Object.keys(apiKeys).filter(k => apiKeys[k]);
+  if (!configured.length) {
+    result.textContent = '✗ No providers configured yet';
+    result.className = 'api-test-result fail';
+    result.style.display = 'block';
+    return;
+  }
+  result.textContent = `Testing ${configured.length} provider${configured.length!==1?'s':''}...`;
+  result.className = 'api-test-result';
+  result.style.display = 'block';
+
+  const results = await Promise.allSettled(
+    configured.map(async name => {
+      const start = Date.now();
+      await PROVIDERS[name].call(apiKeys[name], 'Reply: "ok"', { maxTokens: 5 });
+      return { name, ms: Date.now() - start };
+    })
+  );
+
+  const lines = results.map((r, i) => {
+    const name = configured[i];
+    const p = PROVIDERS[name];
+    if (r.status === 'fulfilled') return `✓ ${p.icon} ${p.label} · ${r.value.ms}ms`;
+    return `✗ ${p.icon} ${p.label} · ${r.reason?.message?.slice(0,40)||'failed'}`;
+  });
+
+  result.innerHTML = lines.join('<br>');
+  result.className = 'api-test-result ' + (results.every(r=>r.status==='fulfilled') ? 'ok' : 'fail');
+}
+
+function updateApiSettingsLabel() {
+  const label = document.getElementById('apiSettingsLabel');
+  const sub   = document.getElementById('apiSettingsSub');
+  if (!label) return;
+  const cloudActive = Object.values(PROVIDERS)
+    .filter(p => p.type==='cloud' && apiKeys[p.name]).length;
+  const localActive = Object.values(PROVIDERS)
+    .filter(p => p.type==='local' && localProviderStatus[p.name]===true).length;
+  const total = cloudActive + localActive;
+  if (total === 0) {
+    label.textContent = 'Manage AI providers';
+    label.style.color = '';
+    sub.textContent = 'No providers configured yet';
+  } else {
+    label.textContent = `${total} provider${total!==1?'s':''} active`;
+    label.style.color = 'var(--green)';
+    const parts = [];
+    if (cloudActive) parts.push(`${cloudActive} cloud`);
+    if (localActive) parts.push(`${localActive} local 📱`);
+    sub.textContent = parts.join(' · ');
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════
+const DOMAINS = {
+  mind:   ['journal','habits','goals','sanskrit'],
+  body:   ['health','yoga','recipes','energy'],
+  wealth: ['stocks','finance','networth'],
+  world:  ['intel','briefing','people']
+};
+
+const MODULE_DEF = {
+  journal:  {icon:'📓',name:'Journal',       stat:()=>`${state.journal.length} entries`,           screen:'journal', phase:1},
+  habits:   {icon:'✅',name:'Habits',        stat:()=>doneHabitsToday()+`/${state.habits.length} today`,screen:'habits',  phase:1},
+  intel:    {icon:'📡',name:'Intel Feed',    stat:()=>`${state.intel.length} insights`,             screen:'intel',   phase:1},
+  stocks:   {icon:'📈',name:'Stock Scanner', stat:()=>`${state.stocks.length} positions`,           screen:'stocks',  phase:1},
+  health:   {icon:'🩺',name:'Health',        stat:()=>`${state.health.length} documents`,           screen:'health',  phase:1},
+  briefing: {icon:'🌐',name:'Daily Briefing',stat:()=>state.briefing.topic||'Tap to configure',    screen:'intel',   phase:1},
+  goals:    {icon:'🎯',name:'Goal Tracker',  stat:()=>state.goals.length?`${state.goals.filter(g=>!g.doneAt).length} active`:'Set your first goal', screen:'goals', phase:2},
+  sanskrit: {icon:'🕉️', name:'Sanskrit',     stat:()=>'Coming soon',                               screen:null,      phase:2},
+  yoga:     {icon:'🧘',name:'Yoga Practice', stat:()=>`${(state.yoga||[]).length} sessions`,        screen:'yoga',    phase:2},
+  recipes:  {icon:'🍳',name:'Recipe Box',    stat:()=>'Coming soon',                               screen:null,      phase:2},
+  energy:   {icon:'⚡',name:'Energy Tracker',stat:()=>state.energy.length?`${state.energy.filter(e=>new Date(e.date).toDateString()===new Date().toDateString()).length} logs today`:'Track your energy', screen:'energy', phase:2},
+  finance:  {icon:'💰',name:'Finance',       stat:()=>state.finance.length?`${state.finance.filter(e=>new Date(e.date).getMonth()===new Date().getMonth()).length} entries this month`:'Log income & expenses', screen:'finance', phase:2},
+  networth: {icon:'🧾',name:'Net Worth',     stat:()=>'Coming soon',                               screen:null,      phase:3},
+  people:   {icon:'👥',name:'People CRM',    stat:()=>'Coming soon',                               screen:null,      phase:3},
+};
+
+let currentDomain = 'mind';
+
+function doneHabitsToday() { return state.habits.filter(h=>h.doneToday).length; }
+
+function setDomain(d, btn) {
+  currentDomain = d;
+  document.querySelectorAll('.domain-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderModuleGrid();
+}
+
+function renderModuleGrid() {
+  const grid = document.getElementById('moduleGrid');
+  const ids = DOMAINS[currentDomain] || [];
+  grid.innerHTML = ids.map((id,i) => {
+    const m = MODULE_DEF[id];
+    if (!m) return '';
+    const delay = (i*0.05).toFixed(2);
+    return `<div class="module-card" style="animation-delay:${delay}s" onclick="${m.screen?`navTo('${m.screen}')`:`showComingSoon('${m.name}')`}">
+      <span class="mc-icon">${m.icon}</span>
+      <div class="mc-name">${m.name}</div>
+      <div class="mc-stat">${m.stat()}</div>
+      ${m.phase>1?`<span class="mc-badge badge-gold">Phase ${m.phase}</span>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderAllModules() {
+  const el = document.getElementById('allModulesList');
+  const phases = [1,2,3];
+  el.innerHTML = phases.map(p => {
+    const mods = Object.entries(MODULE_DEF).filter(([,m])=>m.phase===p);
+    return `<div class="section-head" style="padding-left:0;padding-top:${p===1?0:16}px">Phase ${p}</div>` +
+      mods.map(([id,m]) => `<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;cursor:pointer;transition:border-color .15s" onclick="${m.screen?`navTo('${m.screen}')`:`showComingSoon('${m.name}')`}">
+        <span style="font-size:22px">${m.icon}</span>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:500;color:var(--text)">${m.name}</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px">${m.stat()}</div>
+        </div>
+        <div style="font-size:11px;color:var(--text3)">›</div>
+      </div>`).join('');
+  }).join('');
+}
+
+function showComingSoon(name) {
+  alert(`${name} is in the build queue. The architecture is designed — the module plugs in when ready.`);
+}
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+function navTo(screen) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('screen-'+screen)?.classList.add('active');
+  const nav = document.getElementById('nav-'+screen);
+  if (nav) nav.classList.add('active');
+  const fns = {
+    home:refreshHome, habits:renderHabits, intel:renderIntel,
+    stocks:renderStocks, health:renderHealth, journal:renderJournal,
+    review:refreshReview, modules:renderAllModules, settings:loadSettings,
+    yoga:renderYoga, api:renderApiManager,
+    finance:renderFinance, goals:renderGoals, energy:renderEnergy
+  };
+  if (fns[screen]) fns[screen]();
+}
+
+// ═══════════════════════════════════════════════════════
+// HOME
+// ═══════════════════════════════════════════════════════
+function refreshHome() {
+  const h = new Date().getHours();
+  const name = state.context.name;
+  const greet = (h<12?'Good morning':h<17?'Good afternoon':'Good evening') + (name?`, ${name.split(' ')[0]}`:'') + '.';
+  document.getElementById('greeting').textContent = greet;
+  document.getElementById('dateLine').textContent =
+    new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  document.getElementById('pulseHabits').textContent  = `${doneHabitsToday()}/${state.habits.length}`;
+  document.getElementById('pulseIntel').textContent   = state.intel.length || '—';
+
+  // Energy: today's latest log emoji
+  const todayStr   = new Date().toDateString();
+  const todayEn    = state.energy.filter(e => new Date(e.date).toDateString()===todayStr);
+  const lastEnergy = todayEn.length ? todayEn[todayEn.length-1].level : 0;
+  const enEl = document.getElementById('pulseEnergy');
+  enEl.textContent = lastEnergy ? ['','😴','😔','😐','😊','⚡'][lastEnergy] : '—';
+  enEl.style.fontSize = lastEnergy ? '20px' : '';
+
+  // Finance: this month net in compact form
+  const now = new Date();
+  const monthly = state.finance.filter(e => {
+    const d = new Date(e.date);
+    return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+  });
+  const net = monthly.reduce((s,e) => e.type==='income' ? s+e.amount : s-e.amount, 0);
+  const finEl = document.getElementById('pulseFinance');
+  if (monthly.length) {
+    const absK = Math.abs(net) >= 1000 ? (Math.abs(net)/1000).toFixed(1)+'k' : Math.abs(net).toString();
+    finEl.textContent  = (net<0?'-':'+')+absK;
+    finEl.style.color  = net >= 0 ? 'var(--green)' : 'var(--red)';
+  } else {
+    finEl.textContent = '—';
+    finEl.style.color = '';
+  }
+
+  renderModuleGrid();
+  buildInsights();
+  loadDailyBriefing();
+}
+
+function buildInsights() {
+  const strip = document.getElementById('insightsStrip');
+  const items = [];
+
+  // Wins
+  const wins = state.captures.filter(c=>c.type==='win');
+  if (wins.length) items.push({dot:'dot-green', text:`<strong>${wins.length} win${wins.length!==1?'s':''} logged</strong> — your Win Detector has found things to celebrate`});
+
+  // Intel
+  if (state.intel.length) {
+    const latest = state.intel[0];
+    if (latest.trend_direction==='accelerating') items.push({dot:'dot-gold', text:`<strong>Accelerating trend:</strong> ${latest.what?.slice(0,80)||'Latest intel entry'}…`});
+    else items.push({dot:'dot-blue', text:`<strong>Latest intel:</strong> ${latest.what?.slice(0,80)||'New insight saved'}…`});
+  }
+
+  // Intel action items
+  const actionItems = state.intel.filter(e=>e.action_needed);
+  if (actionItems.length) items.push({dot:'dot-red', text:`<strong>${actionItems.length} intel entr${actionItems.length!==1?'ies':'y'}</strong> flagged for action`});
+
+  // Habits streak
+  if (doneHabitsToday()===state.habits.length && state.habits.length>0) {
+    items.push({dot:'dot-green', text:`<strong>All ${state.habits.length} habits done today</strong> 🔥`});
+  }
+
+  // Goals — active goals near completion
+  const nearDone = state.goals.filter(g => !g.doneAt && g.target > 0 && (g.current/g.target) >= 0.8);
+  if (nearDone.length) items.push({dot:'dot-gold', text:`<strong>${nearDone[0].title}</strong> is ${Math.round((nearDone[0].current/nearDone[0].target)*100)}% done — almost there!`});
+
+  // Goals — recently achieved
+  const recentDone = state.goals.filter(g => g.doneAt && new Date(g.doneAt) > new Date(Date.now()-7*24*60*60*1000));
+  if (recentDone.length) items.push({dot:'dot-green', text:`<strong>Goal achieved this week:</strong> ${recentDone[0].title} 🏆`});
+
+  // Finance — monthly cashflow
+  const now = new Date();
+  const monthly = state.finance.filter(e => { const d=new Date(e.date); return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear(); });
+  if (monthly.length >= 3) {
+    const net = monthly.reduce((s,e)=>e.type==='income'?s+e.amount:s-e.amount, 0);
+    const sign = net >= 0 ? '+' : '';
+    items.push({dot: net>=0?'dot-green':'dot-red', text:`<strong>This month's cashflow:</strong> ${sign}₹${Math.abs(net).toLocaleString('en-IN')} across ${monthly.length} transactions`});
+  }
+
+  // Energy — low energy alert if today average < 2
+  const todayStr  = new Date().toDateString();
+  const todayLogs = state.energy.filter(e=>new Date(e.date).toDateString()===todayStr);
+  if (todayLogs.length >= 2) {
+    const avg = todayLogs.reduce((s,e)=>s+e.level,0)/todayLogs.length;
+    if (avg < 2.5) items.push({dot:'dot-red', text:`<strong>Energy running low today</strong> — consider a break or lighter schedule`});
+    else if (avg >= 4) items.push({dot:'dot-green', text:`<strong>High energy day</strong> ⚡ — good time for demanding work`});
+  }
+
+  if (!items.length) items.push({dot:'dot-gold', text:'Start logging to see AI insights here — patterns, wins, and things worth your attention.'});
+
+  strip.innerHTML = items.map(i=>`<div class="insight-row"><div class="insight-dot ${i.dot}"></div><div class="insight-text">${i.text}</div></div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// DAILY BRIEFING
+// ═══════════════════════════════════════════════════════
+async function loadDailyBriefing() {
+  const today = new Date().toDateString();
+  const topic = state.context.briefTopic || 'AI';
+
+  document.getElementById('briefingTopic').textContent = topic;
+
+  // Use cached if from today
+  if (state.briefing.date === today && state.briefing.what) {
+    renderBriefing(state.briefing);
+    return;
+  }
+
+  document.getElementById('briefingContent').innerHTML = '<div class="briefing-loading">Fetching today\'s briefing...</div>';
+
+  try {
+    const prompt = `${getContext()}\n\nSearch for the single most significant development in "${topic}" from the last 48 hours.\n\nReply ONLY in JSON (no markdown):\n{"what":"one sharp sentence: the key development","why":"one sentence: why it matters to this user specifically","watch":"one thing to keep an eye on"}`;
+    const text = await callAI('briefing', prompt, {search:true, maxTokens:500});
+    const match = text.replace(/```json|```/g,'').trim().match(/\{[\s\S]*\}/);
+    const parsed = match ? JSON.parse(match[0]) : {};
+
+    state.briefing = {date:today, topic, ...parsed};
+    save();
+    renderBriefing(state.briefing);
+  } catch(err) {
+    document.getElementById('briefingContent').innerHTML = `<div class="briefing-body"><div class="briefing-why" style="color:var(--text3)">Could not load briefing. Tap to open Intel Feed and scan manually.</div></div>`;
+  }
+}
+
+function renderBriefing(b) {
+  document.getElementById('briefingTime').textContent = 'Today';
+  document.getElementById('briefingContent').innerHTML = `
+    <div class="briefing-body">
+      <div class="briefing-what">${b.what||'—'}</div>
+      <div class="briefing-why">${b.why||''}</div>
+      ${b.watch?`<div style="font-size:11px;color:var(--gold);margin-top:6px;font-family:var(--sans)">Watch: ${b.watch}</div>`:''}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// HABITS
+// ═══════════════════════════════════════════════════════
+function renderHabits() {
+  const list = document.getElementById('habitsList');
+  list.innerHTML = state.habits.map(h => `
+    <div class="habit-row ${h.doneToday?'habit-done':''}" id="habit_${h.id}">
+      <div class="habit-icon">${h.icon}</div>
+      <div class="habit-info">
+        <div class="habit-name">${h.name}</div>
+        <div class="habit-streak">🔥 ${h.streak} day streak</div>
+      </div>
+      <div class="habit-check ${h.doneToday?'done':''}" onclick="toggleHabit('${h.id}')">
+        ${h.doneToday?'✓':''}
+      </div>
+    </div>`).join('');
+
+  const streaks = document.getElementById('habitsStreaks');
+  const sorted = [...state.habits].sort((a,b)=>b.streak-a.streak);
+  streaks.innerHTML = sorted.map(h => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px">
+      <span style="font-size:18px">${h.icon}</span>
+      <div style="flex:1;font-size:13px;color:var(--text2)">${h.name}</div>
+      <div style="font-family:var(--serif);font-size:18px;color:var(--gold)">${h.streak}</div>
+    </div>`).join('');
+}
+
+function toggleHabit(id) {
+  const h = state.habits.find(x=>x.id===id);
+  if (!h) return;
+  h.doneToday = !h.doneToday;
+  h.streak = h.doneToday ? h.streak+1 : Math.max(0,h.streak-1);
+  save(); renderHabits(); refreshHome();
+}
+
+function openAddHabit() {
+  const name = prompt('Habit name:');
+  if (!name?.trim()) return;
+  const icons = ['✅','📖','🧘','🏃','💧','🎯','💪','🌅','✍️','🎵'];
+  const icon = icons[state.habits.length % icons.length];
+  state.habits.push({id:'h'+Date.now(),name:name.trim(),icon,streak:0,doneToday:false});
+  save(); renderHabits();
+  loadSettings();
+}
+
+function renderSettingsHabits() {
+  const el = document.getElementById('settingsHabitsList');
+  if (!el) return;
+  el.innerHTML = state.habits.map(h => `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px">
+      <span>${h.icon}</span>
+      <div style="flex:1;font-size:13px;color:var(--text2)">${h.name}</div>
+      <div style="font-size:11px;color:var(--text3)">🔥 ${h.streak}</div>
+      <button style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px" onclick="removeHabit('${h.id}')">✕</button>
+    </div>`).join('');
+}
+
+function removeHabit(id) {
+  state.habits = state.habits.filter(h=>h.id!==id);
+  save(); renderSettingsHabits();
+}
+
+// ═══════════════════════════════════════════════════════
+// INTEL FEED
+// ═══════════════════════════════════════════════════════
+let intelFilter = 'all';
+
+function renderIntel() {
+  renderTopicChips();
+  renderIntelEntries();
+}
+
+function renderTopicChips() {
+  const topics = ['all',...new Set(state.intel.map(e=>e.topic).filter(Boolean))];
+  document.getElementById('topicChips').innerHTML = topics.map(t =>
+    `<div class="topic-chip ${intelFilter===t?'active':''}" onclick="setIntelFilter('${t}')">${t==='all'?'All':t}</div>`
+  ).join('');
+}
+
+function setIntelFilter(t) {
+  intelFilter=t; renderTopicChips(); renderIntelEntries();
+}
+
+function renderIntelEntries() {
+  const el = document.getElementById('intelEntries');
+  const filtered = intelFilter==='all' ? state.intel : state.intel.filter(e=>e.topic===intelFilter);
+  if (!filtered.length) {
+    el.innerHTML = `<div style="color:var(--text3);font-size:13px;text-align:center;padding:32px 0">No entries yet — run a scan above</div>`;
+    return;
+  }
+  el.innerHTML = filtered.map(e => {
+    const d = new Date(e.date);
+    const ds = d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}) + ' ' + d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    return `<div class="intel-entry" id="ie_${e.id}" onclick="toggleIntelEntry('${e.id}')">
+      <div class="ie-meta">
+        <span class="ie-topic">${e.topic||'General'}</span>
+        <span class="ie-date">${ds}</span>
+        ${e.action_needed?'<span class="ie-action">⚡ Action</span>':''}
+      </div>
+      <div class="ie-what">${e.what||'Scan result'}</div>
+      <div class="ie-preview">${e.why_it_matters||''}</div>
+      <div class="ie-expanded">
+        ${e.why_it_matters?`<div class="ie-section-label">Why it matters</div><div class="ie-section-text">${e.why_it_matters}</div>`:''}
+        ${e.relevance_note?`<div class="ie-section-label">Relevance to you</div><div class="ie-relevance">${e.relevance_note}</div>`:''}
+        ${e.action_needed&&e.action_note?`<div class="ie-section-label">Action</div><div class="ie-section-text" style="color:#ffaa44">${e.action_note}</div>`:''}
+        <div class="ie-section-label">Signals</div>
+        <div class="ie-section-text">Trend: <span style="color:${e.trend_direction==='accelerating'?'var(--gold)':'var(--text2)'}">${e.trend_direction||'stable'}</span>${e.top_source?` · Source: ${e.top_source}`:''}</div>
+        ${e.tags?.length?`<div class="ie-tags">${e.tags.map(t=>`<span class="ie-tag">${t}</span>`).join('')}</div>`:''}
+        <textarea class="ie-notes" placeholder="Your notes..." onclick="event.stopPropagation()" onchange="saveIntelNote('${e.id}',this.value)">${e.your_notes||''}</textarea>
+        <button style="background:none;border:1px solid var(--red);color:var(--red);font-size:11px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:var(--sans);margin-top:6px" onclick="event.stopPropagation();deleteIntelEntry('${e.id}')">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleIntelEntry(id) { document.getElementById('ie_'+id)?.classList.toggle('open'); }
+function saveIntelNote(id,val) { const e=state.intel.find(x=>x.id===id); if(e){e.your_notes=val;save();} }
+function deleteIntelEntry(id) { state.intel=state.intel.filter(e=>e.id!==id); save(); renderIntel(); }
+function exportIntel() {
+  const blob=new Blob([JSON.stringify({exported:new Date().toISOString(),entries:state.intel},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`intel_${new Date().toISOString().slice(0,10)}.json`;a.click();
+}
+
+async function runIntelScan() {
+  const query = document.getElementById('intelQuery').value.trim();
+  if (!query) return;
+  const btn=document.getElementById('scanBtn');
+  const status=document.getElementById('scanStatus');
+  btn.disabled=true; status.className='scan-status active'; status.textContent='Scanning...';
+
+  // Auto-add topic
+  if (!state.intel.find(e=>e.topic===query)) {
+    // just note it, will be added on save
+  }
+
+  try {
+    const intelPrompt = `${getContext()}\n\nSearch for the latest significant development on: "${query}"\nFocus on last 30 days. Find what is genuinely new or significant.\n\nReply ONLY in JSON (no markdown):\n{"what":"one sharp sentence","why_it_matters":"2-3 sentences of significance","relevance_note":"connection to user's projects, stocks, interests, or health context","trend_direction":"accelerating|stable|declining","action_needed":true|false,"action_note":"if action needed, what to watch","tags":["tag1","tag2"],"top_source":"most credible source found"}`;
+    const text = await callAI('intel', intelPrompt, {search:true, maxTokens:1000});
+    const match = text.replace(/```json|```/g,'').trim().match(/\{[\s\S]*\}/);
+    const parsed = match ? JSON.parse(match[0]) : {};
+
+    const entry = {id:'ie_'+Date.now(), date:new Date().toISOString(), topic:query, your_notes:'', ...parsed};
+    state.intel.unshift(entry); save();
+    status.className='scan-status'; status.textContent=`✓ Saved — ${entry.what?.slice(0,50)||'Scan complete'}...`;
+    document.getElementById('intelQuery').value='';
+    intelFilter=query; renderIntel();
+  } catch(err) {
+    status.className='scan-status'; status.textContent='✗ '+err.message;
+  }
+  btn.disabled=false;
+}
+
+// ═══════════════════════════════════════════════════════
+// STOCKS
+// ═══════════════════════════════════════════════════════
+function renderStocks() {
+  renderSavedVerdicts();
+}
+
+function renderSavedVerdicts() {
+  const el = document.getElementById('savedVerdicts');
+  if (!state.stocks.length) {
+    el.innerHTML=`<div style="color:var(--text3);font-size:13px;text-align:center;padding:24px 0">Enter a ticker above to scan your first position</div>`;
+    return;
+  }
+  el.innerHTML = state.stocks.map(s => renderVerdictCard(s)).join('');
+}
+
+function renderVerdictCard(s) {
+  const vclass = {'hold':'verdict-hold','buy more':'verdict-buy','trim':'verdict-trim','sell':'verdict-sell'}[s.verdict?.toLowerCase()]||'verdict-hold';
+  return `<div class="verdict-card">
+    <div class="vc-head">
+      <div>
+        <div class="vc-ticker">${s.ticker}</div>
+        <div class="vc-price">${new Date(s.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</div>
+      </div>
+      <div class="vc-verdict ${vclass}">${s.verdict||'Hold'}</div>
+    </div>
+    <div class="vc-body">
+      <div class="vc-section"><div class="vc-section-label">Key insight</div><div class="vc-section-text">${s.key_insight||'—'}</div></div>
+      ${s.bull_case?`<div class="vc-section"><div class="vc-section-label">Bull case</div><div class="vc-bull" style="font-size:13px;color:var(--text2);line-height:1.5">${s.bull_case}</div></div>`:''}
+      ${s.bear_case?`<div class="vc-section"><div class="vc-section-label">Bear case</div><div class="vc-bear" style="font-size:13px;color:var(--text2);line-height:1.5">${s.bear_case}</div></div>`:''}
+      ${s.catalyst?`<div class="vc-section"><div class="vc-section-label">Watch</div><div class="vc-section-text">${s.catalyst}</div></div>`:''}
+    </div>
+    <div class="vc-footer">
+      <span>${s.reasoning||''}</span>
+      <span class="vc-confidence">${s.confidence||'—'}% confidence</span>
+    </div>
+  </div>`;
+}
+
+async function runStockScan() {
+  const ticker = document.getElementById('stockTicker').value.trim().toUpperCase();
+  if (!ticker) return;
+  const btn=document.getElementById('stockScanBtn');
+  btn.disabled=true; btn.textContent='...';
+  document.getElementById('stockResult').innerHTML=`<div style="color:var(--text3);font-size:13px;padding:16px 0;text-align:center">🔍 Scanning ${ticker}...</div>`;
+
+  try {
+    const stockPrompt = `${getContext()}\n\nConduct a comprehensive stock analysis for ${ticker}. Search for: latest news, recent earnings, competitor developments, valuation metrics, analyst sentiment.\n\nReply ONLY in JSON (no markdown):\n{"ticker":"${ticker}","verdict":"Hold|Buy More|Trim|Sell","confidence":75,"key_insight":"one sentence: the most important thing to know right now","bull_case":"2-3 bullet points as one string: what supports buying/holding","bear_case":"2-3 bullet points as one string: what are the risks","catalyst":"upcoming events to watch (earnings date, product launch, etc)","reasoning":"one sentence explaining the verdict","thesis_intact":true|false}`;
+    const text = await callAI('stocks', stockPrompt, {search:true, maxTokens:1000});
+    const match = text.replace(/```json|```/g,'').trim().match(/\{[\s\S]*\}/);
+    const s = match ? JSON.parse(match[0]) : {ticker,verdict:'Hold',confidence:50};
+    s.date = new Date().toISOString();
+
+    // Save or update
+    const idx = state.stocks.findIndex(x=>x.ticker===ticker);
+    if (idx>=0) state.stocks[idx]=s; else state.stocks.unshift(s);
+    save();
+
+    document.getElementById('stockResult').innerHTML = renderVerdictCard(s);
+    renderSavedVerdicts();
+  } catch(err) {
+    document.getElementById('stockResult').innerHTML=`<div style="color:var(--red);font-size:13px;padding:12px 0">Error: ${err.message}</div>`;
+  }
+  btn.disabled=false; btn.textContent='Scan';
+  document.getElementById('stockTicker').value='';
+}
+
+// ═══════════════════════════════════════════════════════
+// HEALTH
+// ═══════════════════════════════════════════════════════
+function renderHealth() {
+  renderMeds();
+  renderHealthDocs();
+}
+
+function renderMeds() {
+  const el = document.getElementById('medsList');
+  if (!state.meds.length) {
+    el.innerHTML=`<div style="color:var(--text3);font-size:13px;padding:8px 0">No medications added. Add them in Settings.</div>`;
+    return;
+  }
+  el.innerHTML = state.meds.map(m => `
+    <div class="med-row">
+      <div class="med-icon">💊</div>
+      <div class="med-info">
+        <div class="med-name">${m.name}</div>
+        <div class="med-dose">${m.dose} · ${m.frequency}</div>
+      </div>
+      <div class="med-check ${m.doneToday?'done':''}" onclick="toggleMed('${m.id}')">${m.doneToday?'✓':''}</div>
+    </div>`).join('');
+}
+
+function toggleMed(id) {
+  const m=state.meds.find(x=>x.id===id);
+  if(m){m.doneToday=!m.doneToday;save();renderMeds();}
+}
+
+function openAddMed() {
+  const name=prompt('Medication name:'); if(!name?.trim()) return;
+  const dose=prompt('Dose (e.g. 500mg):',''); 
+  const freq=prompt('Frequency (e.g. twice daily):','once daily');
+  state.meds.push({id:'med_'+Date.now(),name:name.trim(),dose:dose||'',frequency:freq||'once daily',doneToday:false});
+  save(); renderMeds(); renderSettingsMeds();
+}
+
+function renderSettingsMeds() {
+  const el=document.getElementById('settingsMedsList'); if(!el) return;
+  el.innerHTML = state.meds.map(m => `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px">
+      <span>💊</span>
+      <div style="flex:1"><div style="font-size:13px;color:var(--text2)">${m.name}</div><div style="font-size:11px;color:var(--text3)">${m.dose} · ${m.frequency}</div></div>
+      <button style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px" onclick="removeMed('${m.id}')">✕</button>
+    </div>`).join('');
+}
+
+function removeMed(id) { state.meds=state.meds.filter(m=>m.id!==id); save(); renderSettingsMeds(); }
+
+function renderHealthDocs() {
+  const el=document.getElementById('healthDocsList');
+  if(!state.health.length){el.innerHTML=`<div style="color:var(--text3);font-size:13px;padding:8px 0">No documents yet — add a lab report or prescription above.</div>`;return;}
+  el.innerHTML=state.health.map(d=>`
+    <div style="display:flex;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px">
+      <span style="font-size:22px">📄</span>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500;color:var(--text)">${d.type_label||'Document'}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${new Date(d.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'2-digit'})} · ${d.summary?.slice(0,60)||''}...</div>
+      </div>
+      ${d.filePath ? `<button onclick="openRawFile('${d.filePath}')" style="background:none;border:1px solid var(--border);color:var(--text3);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0" title="Open original file">📂 Open</button>` : ''}
+    </div>`).join('');
+}
+
+async function handleHealthFile(input) {
+  const file=input.files[0]; if(!file) return; input.value='';
+  const result=document.getElementById('healthDocResult');
+  result.innerHTML=`<div style="color:var(--text3);font-size:13px;padding:12px 0;text-align:center">🔍 Reading document...</div>`;
+
+  try {
+    const base64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});
+    const isPDF=file.type==='application/pdf';
+    const msgContent=[
+      {type:isPDF?'document':'image',source:{type:'base64',media_type:isPDF?'application/pdf':file.type,data:base64}},
+      {type:'text',text:`${getContext()}\n\nThis is a medical document. Extract structured information.\n\nReply ONLY in JSON:\n{"type_label":"Lab Report|Prescription|Discharge Summary|Scan Report|Doctor Notes|Other","conditions_mentioned":[],"medications":[],"values":[{"name":"","value":"","unit":"","reference":"","flagged":false}],"summary":"2-3 sentence summary","follow_up":"any follow-up actions mentioned","date_of_report":"if visible"}`}
+    ];
+    const textPrompt = `${getContext()}\n\nThis is a medical document. Extract structured information.\n\nReply ONLY in JSON:\n{"type_label":"Lab Report|Prescription|Discharge Summary|Scan Report|Doctor Notes|Other","conditions_mentioned":[],"medications":[],"values":[{"name":"","value":"","unit":"","reference":"","flagged":false}],"summary":"2-3 sentence summary","follow_up":"any follow-up actions mentioned","date_of_report":"if visible"}`;
+    const text=await callAI('health', textPrompt, {images:msgContent, maxTokens:800});
+    const match=text.replace(/```json|```/g,'').trim().match(/\{[\s\S]*\}/);
+    const ex=match?JSON.parse(match[0]):{};
+
+    const id    = 'hd_'+Date.now();
+    const entry = {id, date:new Date().toISOString(), ...ex, filePath:null};
+    // Save raw file to folder (non-blocking — don't await so UI stays snappy)
+    saveRawFile(id, base64, isPDF?'application/pdf':file.type)
+      .then(path => {
+        if (path) {
+          const idx = state.health.findIndex(h=>h.id===id);
+          if (idx !== -1) { state.health[idx].filePath = path; save(); }
+        }
+      });
+    state.health.unshift(entry); save(); renderHealthDocs();
+
+    result.innerHTML=`<div class="card" style="animation:popIn .3s ease">
+      <div class="card-head"><span class="card-head-icon">📄</span><span class="card-head-title">${ex.type_label||'Document'} saved</span></div>
+      <div class="card-body">
+        <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:8px">${ex.summary||'Document processed.'}</div>
+        ${ex.values?.length?`<div style="font-size:11px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em">Values extracted</div>${ex.values.map(v=>`<div style="display:flex;gap:8px;font-size:13px;padding:4px 0;color:${v.flagged?'var(--red)':'var(--text2)'}">${v.name}: <strong>${v.value} ${v.unit||''}</strong>${v.reference?' (ref: '+v.reference+')':''}</div>`).join('')}`:''}
+        ${ex.follow_up?`<div style="margin-top:10px;padding:8px 12px;background:var(--gold-dim);border-left:2px solid var(--gold);font-size:13px;color:var(--text2)">${ex.follow_up}</div>`:''}
+      </div>
+    </div>`;
+  } catch(err) {
+    result.innerHTML=`<div style="color:var(--red);font-size:13px;padding:12px 0">Error: ${err.message}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// JOURNAL
+// ═══════════════════════════════════════════════════════
+function renderJournal() {
+  const el=document.getElementById('journalEntries');
+  if(!state.journal.length){el.innerHTML=`<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px 0">No entries yet — write your first reflection above.</div>`;return;}
+  el.innerHTML=state.journal.map(j=>`
+    <div class="journal-entry-card">
+      <div class="je-date">${new Date(j.date).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long',year:'numeric'})}</div>
+      <div class="je-preview">${j.text}</div>
+    </div>`).join('');
+}
+
+function saveJournalEntry() {
+  const text=document.getElementById('journalText').value.trim(); if(!text) return;
+  state.journal.unshift({id:'j_'+Date.now(),date:new Date().toISOString(),text});
+  save(); document.getElementById('journalText').value=''; renderJournal();
+}
+
+async function getJournalPrompt() {
+  const btn=document.querySelector('#screen-journal .gen-btn'); btn.textContent='✨ Thinking...'; btn.disabled=true;
+  try {
+    const prompt=await callAI('journal', `${getContext()}\n\nGive me ONE thoughtful journal reflection prompt that is personal to my context. One sentence only. No preamble.`, {maxTokens:200});
+    document.getElementById('journalText').placeholder=prompt.trim();
+    document.getElementById('journalText').focus();
+  } catch(_){}
+  btn.textContent='✨ Give me a reflection prompt'; btn.disabled=false;
+}
+
+// ═══════════════════════════════════════════════════════
+// REVIEW
+// ═══════════════════════════════════════════════════════
+function refreshReview() {
+  document.getElementById('rCaptures').textContent=state.captures.length;
+  document.getElementById('rHabits').textContent=state.habits.filter(h=>h.streak>0).length;
+  document.getElementById('rIntel').textContent=state.intel.length;
+
+  const wins=document.getElementById('winsList');
+  const w=[];
+  const captures_wins=state.captures.filter(c=>c.type==='win');
+  if(captures_wins.length) w.push({e:'🏆',t:`<strong>${captures_wins.length} wins logged</strong> — ${captures_wins[0].text?.slice(0,60)||''}...`});
+  const topStreak=state.habits.reduce((max,h)=>h.streak>max.streak?h:max,{streak:0});
+  if(topStreak.streak>0) w.push({e:'🔥',t:`<strong>${topStreak.name}</strong> — ${topStreak.streak} day streak`});
+  if(state.intel.length) w.push({e:'📡',t:`<strong>${state.intel.length} insights</strong> saved in your knowledge base`});
+  if(state.health.length) w.push({e:'🩺',t:`<strong>${state.health.length} health documents</strong> analysed and stored`});
+
+  // Goals
+  const activeGoals  = state.goals.filter(g=>!g.doneAt);
+  const doneGoals    = state.goals.filter(g=>!!g.doneAt);
+  if(doneGoals.length) w.push({e:'🎯',t:`<strong>${doneGoals.length} goal${doneGoals.length!==1?'s':''} achieved</strong> total — ${doneGoals[doneGoals.length-1]?.title||''}`});
+  if(activeGoals.length) {
+    const best = activeGoals.filter(g=>g.target>0).sort((a,b)=>(b.current/b.target)-(a.current/a.target))[0];
+    if(best) w.push({e:'📈',t:`<strong>${best.title}</strong> — ${Math.round((best.current/best.target)*100)}% complete`});
+  }
+
+  // Finance
+  const now = new Date();
+  const monthly = state.finance.filter(e=>{ const d=new Date(e.date); return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear(); });
+  if(monthly.length) {
+    const net = monthly.reduce((s,e)=>e.type==='income'?s+e.amount:s-e.amount,0);
+    w.push({e:'💰',t:`<strong>Finance this month:</strong> ${monthly.length} entries, net ${net>=0?'+':''}₹${Math.abs(net).toLocaleString('en-IN')}`});
+  }
+
+  // Energy
+  if(state.energy.length>=5) {
+    const byHour={};
+    state.energy.forEach(e=>{ if(!byHour[e.hour]){byHour[e.hour]={sum:0,count:0}} byHour[e.hour].sum+=e.level; byHour[e.hour].count++; });
+    const peak=Object.entries(byHour).map(([h,v])=>({hour:Number(h),avg:v.sum/v.count})).sort((a,b)=>b.avg-a.avg)[0];
+    if(peak) { const fmt=h=>`${h%12||12}${h<12?'am':'pm'}`; w.push({e:'⚡',t:`<strong>Peak energy hour:</strong> ${fmt(peak.hour)} — schedule your hardest work here`}); }
+  }
+
+  wins.innerHTML=w.length?w.map(x=>`<div class="win-row"><span class="win-emoji">${x.e}</span><div class="win-text">${x.t}</div></div>`).join(''):`<div style="color:var(--text3);font-size:13px;text-align:center;padding:12px 0">Log things first — Claude will find your wins.</div>`;
+}
+
+async function generateWeeklyReview() {
+  const btn=document.querySelector('#screen-review .gen-btn');
+  btn.innerHTML='⏳ Writing...'; btn.disabled=true;
+
+  const recentCaptures=state.captures.slice(0,15).map(c=>`[${c.type}] ${c.text}`).join('\n');
+  const habits=state.habits.map(h=>`${h.name}: ${h.streak} streak, done today: ${h.doneToday}`).join('\n');
+  const recentIntel=state.intel.slice(0,5).map(e=>e.what).join('\n');
+  const recentStocks=state.stocks.map(s=>`${s.ticker}: ${s.verdict}`).join('\n');
+  const recentJournal=state.journal.slice(0,3).map(j=>j.text.slice(0,100)).join('\n');
+
+  // New modules
+  const now = new Date();
+  const monthlyFin = state.finance.filter(e=>{ const d=new Date(e.date); return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear(); });
+  const finSummary = monthlyFin.length
+    ? `Income: ₹${monthlyFin.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0).toLocaleString('en-IN')}, Expenses: ₹${monthlyFin.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0).toLocaleString('en-IN')}, Categories: ${[...new Set(monthlyFin.map(e=>e.category))].join(', ')}`
+    : 'none';
+
+  const activeGoals = state.goals.filter(g=>!g.doneAt).map(g=>`"${g.title}" (${g.target>0?Math.round((g.current/g.target)*100)+'%':'in progress'})`).join(', ');
+  const doneGoals   = state.goals.filter(g=>!!g.doneAt).map(g=>g.title).join(', ');
+
+  const energyLogs  = state.energy.slice(-14);
+  const avgEnergy   = energyLogs.length ? (energyLogs.reduce((s,e)=>s+e.level,0)/energyLogs.length).toFixed(1) : 'no data';
+
+  try {
+    const reviewPrompt=`You are writing a personal weekly review for the user of Life OS.\n\n${getContext()}\n\nRecent captures:\n${recentCaptures||'none'}\n\nHabits:\n${habits||'none'}\n\nIntel entries:\n${recentIntel||'none'}\n\nStock verdicts:\n${recentStocks||'none'}\n\nJournal snippets:\n${recentJournal||'none'}\n\nFinance this month:\n${finSummary}\n\nActive goals:\n${activeGoals||'none'}\n\nCompleted goals:\n${doneGoals||'none'}\n\nEnergy (last 2 weeks avg): ${avgEnergy}/5\n\nWrite a warm, personal weekly review (4 short paragraphs). Lead with wins. Note one pattern. Flag one thing needing attention. Close with one question to sit with. Speak to the person, not about them. No bullet points. Thoughtful friend tone, not productivity coach.`;
+    const text=await callAI('review', reviewPrompt, {maxTokens:800});
+    document.getElementById('reviewOutput').style.display='block';
+    document.getElementById('reviewText').innerHTML=text.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+  } catch(err) {
+    document.getElementById('reviewOutput').style.display='block';
+    document.getElementById('reviewText').textContent='Error: '+err.message;
+  }
+  btn.innerHTML='✨ Generate weekly review'; btn.disabled=false;
+}
+
+// ═══════════════════════════════════════════════════════
+// CAPTURE SHEET
+// ═══════════════════════════════════════════════════════
+let sheetMode='general';
+
+const SHEET_TYPES = {
+  general:['📝 Note','🏆 Win','💡 Idea','🌡️ Mood','📋 Log'],
+  health: ['🩺 Symptom','💊 Medication note','🏃 Activity','😴 Sleep'],
+  finance:['💵 Income','💸 Expense'],
+  goal:   [],
+};
+
+const SHEET_TITLES = {
+  general:'What\'s on your mind?',
+  health: 'Log a health observation',
+  finance:'Log income or expense',
+  goal:   'Set a new goal',
+};
+
+const SHEET_PLACEHOLDERS = {
+  general:'Type anything...',
+  health: 'Symptom, reading, or observation...',
+  finance:'e.g. "salary 85000" or "groceries 2400" or "uber 350"',
+  goal:   'Goal title\n(optional second line: why this matters to you)',
+};
+
+function openSheet(mode) {
+  sheetMode=mode||'general';
+  const types=SHEET_TYPES[sheetMode]||SHEET_TYPES.general;
+  document.getElementById('sheetTitle').textContent = SHEET_TITLES[sheetMode]||SHEET_TITLES.general;
+  document.getElementById('sheetText').value='';
+  document.getElementById('sheetText').placeholder = SHEET_PLACEHOLDERS[sheetMode]||SHEET_PLACEHOLDERS.general;
+  document.getElementById('sheetTypes').innerHTML=types.map((t,i)=>`<div class="sheet-type ${i===0?'selected':''}" onclick="selectSheetType(this)">${t}</div>`).join('');
+
+  const overlay=document.getElementById('sheetOverlay'),sheet=document.getElementById('captureSheet');
+  overlay.classList.add('open');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    overlay.classList.add('visible'); sheet.classList.add('open');
+    setTimeout(()=>document.getElementById('sheetText').focus(),320);
+  }));
+}
+
+function closeSheet() {
+  const overlay=document.getElementById('sheetOverlay'),sheet=document.getElementById('captureSheet');
+  overlay.classList.remove('visible'); sheet.classList.remove('open');
+  setTimeout(()=>{ overlay.classList.remove('open'); document.getElementById('sheetText').value=''; },320);
+}
+
+function selectSheetType(el) { document.querySelectorAll('.sheet-type').forEach(e=>e.classList.remove('selected')); el.classList.add('selected'); }
+
+function saveCapture() {
+  const text=document.getElementById('sheetText').value.trim(); if(!text) return;
+
+  // Route to dedicated handlers for finance and goal
+  if (sheetMode==='finance') {
+    closeSheet();
+    saveFinanceEntry(text);
+    navTo('finance');
+    return;
+  }
+  if (sheetMode==='goal') {
+    closeSheet();
+    saveGoalEntry(text);
+    navTo('goals');
+    return;
+  }
+
+  const typeEl=document.querySelector('.sheet-type.selected');
+  const typeLabel=typeEl?.textContent||'Note';
+  const type=typeLabel.includes('Win')?'win':typeLabel.includes('Mood')?'mood':typeLabel.includes('Idea')?'idea':typeLabel.includes('Symptom')?'health':'note';
+
+  state.captures.unshift({id:'cap_'+Date.now(),date:new Date().toISOString(),type,text,mode:sheetMode});
+  save(); closeSheet(); refreshHome();
+
+  // Flash feedback
+  const inner=document.querySelector('.nav-capture-inner');
+  inner.textContent='✓'; inner.style.background='var(--green)';
+  setTimeout(()=>{inner.textContent='+';inner.style.background='var(--gold)';},1000);
+}
+
+// ═══════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════
+function loadSettings() {
+  const c=state.context;
+  document.getElementById('ctxName').value       =c.name       ||'';
+  document.getElementById('ctxProjects').value   =c.projects   ||'';
+  document.getElementById('ctxStocks').value     =c.stocks     ||'';
+  document.getElementById('ctxInterests').value  =c.interests  ||'';
+  document.getElementById('ctxHealth').value     =c.health     ||'';
+  document.getElementById('ctxBriefTopic').value =c.briefTopic ||'AI';
+  renderSettingsHabits();
+  renderSettingsMeds();
+}
+
+function saveContext() {
+  state.context={
+    name:      document.getElementById('ctxName').value.trim(),
+    projects:  document.getElementById('ctxProjects').value.trim(),
+    stocks:    document.getElementById('ctxStocks').value.trim(),
+    interests: document.getElementById('ctxInterests').value.trim(),
+    health:    document.getElementById('ctxHealth').value.trim(),
+    briefTopic:document.getElementById('ctxBriefTopic').value.trim()||'AI',
+  };
+  save();
+  const btn=document.querySelector('.save-btn-full');
+  btn.textContent='Saved ✓'; setTimeout(()=>btn.textContent='Save Context',1500);
+}
+
+function exportAll() { exportFallback(); }
+
+function clearAll() {
+  if(!confirm('Clear ALL Life OS data?')) return;
+  const ctx=state.context;
+  state={context:ctx,captures:[],habits:state.habits,intel:[],stocks:[],health:[],journal:[],meds:state.meds,yoga:[],briefing:{date:'',what:'',why:'',topic:''},finance:[],goals:[],energy:[]};
+  save(); refreshHome();
+}
+
+// ═══════════════════════════════════════════════════════
+// ENCRYPTION — AES-GCM via Web Crypto API
+// ═══════════════════════════════════════════════════════
+const CRYPTO_SALT_KEY = 'los_salt_v3';
+const PIN_HASH_KEY    = 'los_pin_hash_v3';
+const ENC_DATA_KEY    = 'los_enc_data_v3';
+const PIN_SET_KEY     = 'los_pin_set_v3';
+
+let cryptoKey = null; // AES-GCM CryptoKey, lives in memory only
+
+async function deriveKey(pin, salt) {
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', enc.encode(pin), 'PBKDF2', false, ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    { name:'PBKDF2', salt, iterations:200000, hash:'SHA-256' },
+    keyMaterial,
+    { name:'AES-GCM', length:256 },
+    false, ['encrypt','decrypt']
+  );
+}
+
+async function encryptData(key, data) {
+  const iv  = crypto.getRandomValues(new Uint8Array(12));
+  const enc = new TextEncoder();
+  const ct  = await crypto.subtle.encrypt({name:'AES-GCM',iv}, key, enc.encode(JSON.stringify(data)));
+  // Store iv + ciphertext as base64
+  const combined = new Uint8Array(iv.byteLength + ct.byteLength);
+  combined.set(iv, 0); combined.set(new Uint8Array(ct), iv.byteLength);
+  return btoa(String.fromCharCode(...combined));
+}
+
+async function decryptData(key, b64) {
+  const bytes    = Uint8Array.from(atob(b64), c=>c.charCodeAt(0));
+  const iv       = bytes.slice(0, 12);
+  const ct       = bytes.slice(12);
+  const pt       = await crypto.subtle.decrypt({name:'AES-GCM',iv}, key, ct);
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+
+async function hashPin(pin, salt) {
+  const enc  = new TextEncoder();
+  const data = enc.encode(pin + btoa(String.fromCharCode(...salt)));
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return btoa(String.fromCharCode(...new Uint8Array(hash)));
+}
+
+function getSalt() {
+  let s = localStorage.getItem(CRYPTO_SALT_KEY);
+  if (!s) {
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    s = btoa(String.fromCharCode(...salt));
+    localStorage.setItem(CRYPTO_SALT_KEY, s);
+  }
+  return Uint8Array.from(atob(s), c=>c.charCodeAt(0));
+}
+
+async function saveEncrypted() {
+  if (!cryptoKey) { writeToLS(); return; }
+  try {
+    const enc = await encryptData(cryptoKey, state);
+    localStorage.setItem(ENC_DATA_KEY, enc);
+    Object.values(KEYS).forEach(k => localStorage.removeItem(k));
+  } catch(e) { console.error('Encrypt error', e); writeToLS(); }
+}
+
+async function loadDecrypted() {
+  const enc = localStorage.getItem(ENC_DATA_KEY);
+  if (!enc || !cryptoKey) return false;
+  try {
+    const decrypted = await decryptData(cryptoKey, enc);
+    Object.assign(state, decrypted);
+    return true;
+  } catch(e) { return false; }
+}
+
+// save() is defined in DATA section — wraps LS + file
+// saveEncrypted() is called by the PIN layer after key is set
+
+// ═══════════════════════════════════════════════════════
+// PIN LOCK
+// ═══════════════════════════════════════════════════════
+let pinBuffer   = '';
+let pinSetup    = false;
+let pinConfirm  = false;
+let pinFirst    = '';
+
+function showPin(setupMode = false) {
+  pinBuffer = ''; pinFirst = ''; pinConfirm = false;
+  pinSetup = setupMode;
+  document.getElementById('pinScreen').classList.add('show');
+  document.getElementById('app').style.display = 'none';
+
+  if (setupMode) {
+    document.getElementById('pinSub').textContent        = 'Create a PIN to protect your data';
+    document.getElementById('pinSetupStep').textContent  = 'STEP 1 OF 2';
+    document.getElementById('pinSetupLabel').textContent = 'Choose a 4-digit PIN.\nYou\'ll need this every time you open the app.';
+  } else {
+    document.getElementById('pinSub').textContent        = 'Enter your PIN';
+    document.getElementById('pinSetupStep').textContent  = '';
+    document.getElementById('pinSetupLabel').textContent = '';
+  }
+  updatePinDots();
+}
+
+function hidePinScreen() {
+  document.getElementById('pinScreen').classList.remove('show');
+  document.getElementById('app').style.display = '';
+}
+
+function updatePinDots(err = false) {
+  for (let i=0; i<4; i++) {
+    const d = document.getElementById('pd'+i);
+    d.classList.toggle('filled', i < pinBuffer.length && !err);
+    d.classList.toggle('error',  err);
+  }
+}
+
+function pinPress(digit) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += digit;
+  updatePinDots();
+  document.getElementById('pinMsg').textContent = '';
+  if (pinBuffer.length === 4) setTimeout(handlePinComplete, 120);
+}
+
+function pinDel() {
+  pinBuffer = pinBuffer.slice(0,-1);
+  updatePinDots();
+}
+
+async function handlePinComplete() {
+  const salt = getSalt();
+  if (pinSetup) {
+    if (!pinConfirm) {
+      // First entry — store and ask to confirm
+      pinFirst   = pinBuffer;
+      pinBuffer  = '';
+      pinConfirm = true;
+      document.getElementById('pinSetupStep').textContent  = 'STEP 2 OF 2';
+      document.getElementById('pinSetupLabel').textContent = 'Enter the same PIN again to confirm.';
+      updatePinDots();
+      return;
+    }
+    // Confirmation
+    if (pinBuffer !== pinFirst) {
+      document.getElementById('pinMsg').textContent = 'PINs don\'t match — try again';
+      document.getElementById('pinMsg').className   = 'pin-msg error';
+      updatePinDots(true);
+      setTimeout(() => {
+        pinBuffer = ''; pinFirst = ''; pinConfirm = false;
+        document.getElementById('pinSetupStep').textContent  = 'STEP 1 OF 2';
+        document.getElementById('pinSetupLabel').textContent = 'Choose a 4-digit PIN.';
+        updatePinDots();
+        document.getElementById('pinMsg').textContent = '';
+      }, 1000);
+      return;
+    }
+    // PINs match — derive key, hash PIN, save
+    const hash = await hashPin(pinBuffer, salt);
+    localStorage.setItem(PIN_HASH_KEY, hash);
+    localStorage.setItem(PIN_SET_KEY, '1');
+    cryptoKey  = await deriveKey(pinBuffer, salt);
+    await saveEncrypted();
+    await loadApiKeys(); // re-encrypt any plain keys that were saved before PIN
+    loadRouting();
+    document.getElementById('pinMsg').textContent = 'PIN set! ✓';
+    document.getElementById('pinMsg').className   = 'pin-msg';
+    updatePinDots();
+    setTimeout(() => { hidePinScreen(); updateApiSettingsLabel(); refreshHome(); }, 600);
+
+  } else {
+    // Unlock mode — verify PIN
+    const storedHash = localStorage.getItem(PIN_HASH_KEY);
+    const hash       = await hashPin(pinBuffer, salt);
+    if (hash !== storedHash) {
+      document.getElementById('pinMsg').textContent = 'Wrong PIN';
+      document.getElementById('pinMsg').className   = 'pin-msg error';
+      updatePinDots(true);
+      setTimeout(() => { pinBuffer=''; updatePinDots(); document.getElementById('pinMsg').textContent=''; }, 1000);
+      return;
+    }
+    // Correct — derive key and load
+    cryptoKey = await deriveKey(pinBuffer, salt);
+    const ok  = await loadDecrypted();
+    if (!ok) loadFromLS();
+    await loadApiKeys();
+    loadRouting();
+    dailyHabitReset();
+    updateSettingsFileRow();
+    updateApiSettingsLabel();
+    hidePinScreen();
+    refreshHome();
+    // Ping local providers in background (non-blocking)
+    setTimeout(() => pingAllLocalProviders(), 1500);
+  }
+}
+
+function changePIN() {
+  if (!confirm('Change your PIN? You\'ll need to re-enter a new one.')) return;
+  pinSetup  = true;
+  pinBuffer = ''; pinFirst = ''; pinConfirm = false;
+  document.getElementById('pinScreen').classList.add('show');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('pinSub').textContent = 'Create a new PIN';
+  document.getElementById('pinSetupStep').textContent = 'STEP 1 OF 2';
+  document.getElementById('pinSetupLabel').textContent = 'Choose a new 4-digit PIN.';
+  updatePinDots();
+}
+
+// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// FINANCE TRACKER
+// ═══════════════════════════════════════════════════════
+const FIN_CATEGORIES = {
+  income:    {label:'Income',    icon:'💵', color:'var(--green)'},
+  food:      {label:'Food',      icon:'🍔', color:'var(--red)'},
+  transport: {label:'Transport', icon:'🚗', color:'var(--blue)'},
+  health:    {label:'Health',    icon:'🩺', color:'var(--purple)'},
+  shopping:  {label:'Shopping',  icon:'🛍️', color:'var(--gold)'},
+  utilities: {label:'Utilities', icon:'💡', color:'var(--text2)'},
+  other:     {label:'Other',     icon:'📦', color:'var(--text3)'},
+};
+let finFilter = 'all';
+
+function renderFinance() {
+  const now   = new Date();
+  const month = now.getMonth();
+  const year  = now.getFullYear();
+  const monthly = state.finance.filter(e => {
+    const d = new Date(e.date);
+    return d.getMonth() === month && d.getFullYear() === year;
+  });
+  const income  = monthly.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount, 0);
+  const expense = monthly.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount, 0);
+  const net     = income - expense;
+  const fmt = n => '₹' + Math.abs(n).toLocaleString('en-IN');
+  document.getElementById('finIncome').textContent  = fmt(income);
+  document.getElementById('finExpense').textContent = fmt(expense);
+  const netEl = document.getElementById('finNet');
+  netEl.textContent = (net < 0 ? '-' : '') + fmt(net);
+  netEl.className   = 'fin-stat-val net ' + (net >= 0 ? 'pos' : 'neg');
+
+  const filtered = finFilter === 'all'
+    ? [...state.finance].reverse()
+    : state.finance.filter(e => e.category === finFilter || (finFilter==='income'&&e.type==='income')).reverse();
+
+  const list = document.getElementById('finList');
+  if (!filtered.length) {
+    list.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text3)">
+      <div style="font-size:40px;margin-bottom:10px">💰</div>
+      <div style="font-size:14px">No entries yet — tap ＋ to log income or an expense</div>
+    </div>`;
+    return;
+  }
+  list.innerHTML = filtered.slice(0,50).map((e,i) => {
+    const cat  = FIN_CATEGORIES[e.category] || FIN_CATEGORIES.other;
+    const d    = new Date(e.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    const sign = e.type === 'income' ? '+' : '-';
+    return `<div class="fin-entry" style="animation-delay:${(i*.04).toFixed(2)}s">
+      <div class="fin-entry-icon">${cat.icon}</div>
+      <div class="fin-entry-info">
+        <div class="fin-entry-desc">${e.desc}</div>
+        <div class="fin-entry-meta">${cat.label} · ${d}</div>
+      </div>
+      <div class="fin-entry-amt ${e.type}">${sign}₹${e.amount.toLocaleString('en-IN')}</div>
+    </div>`;
+  }).join('');
+}
+
+function filterFinance(cat, el) {
+  finFilter = cat;
+  document.querySelectorAll('.fin-cat').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderFinance();
+}
+
+function openFinanceEntry() {
+  // Reuse capture sheet with finance mode
+  openSheet('finance');
+}
+
+async function saveFinanceEntry(text) {
+  if (!text.trim()) return;
+  // Claude categorises the natural language entry
+  const prompt = `Parse this finance entry and reply ONLY in JSON:
+"${text}"
+{"type":"income|expense","amount":number_in_rupees,"desc":"short clean description","category":"income|food|transport|health|shopping|utilities|other","note":"optional context"}
+Amount should be a number without currency symbol. If unclear, default to expense.`;
+  let parsed = { type:'expense', amount:0, desc:text, category:'other', note:'' };
+  try {
+    const raw   = await callAI('finance', prompt, {maxTokens:200});
+    const match = raw.replace(/```json|```/g,'').trim().match(/\{[\s\S]*\}/);
+    if (match) parsed = {...parsed, ...JSON.parse(match[0])};
+  } catch(_) {}
+  const entry = {
+    id:       'fin_'+Date.now(),
+    date:     new Date().toISOString(),
+    ...parsed
+  };
+  state.finance.unshift(entry);
+  saveAll();
+  renderFinance();
+}
+
+// ═══════════════════════════════════════════════════════
+// GOAL TRACKER
+// ═══════════════════════════════════════════════════════
+function renderGoals() {
+  const list = document.getElementById('goalList');
+  const active   = state.goals.filter(g => !g.doneAt);
+  const achieved = state.goals.filter(g => !!g.doneAt);
+
+  if (!state.goals.length) {
+    list.innerHTML = `<div style="text-align:center;padding:48px 20px;color:var(--text3)">
+      <div style="font-size:48px;margin-bottom:12px">🎯</div>
+      <div style="font-size:14px;line-height:1.6;margin-bottom:20px">No goals yet.<br>Tap ＋ to set one.</div>
+    </div>`;
+    return;
+  }
+
+  const renderGoal = (g, i) => {
+    const pct     = g.target > 0 ? Math.min(100, Math.round((g.current/g.target)*100)) : 0;
+    const isDone  = !!g.doneAt;
+    const msDone  = (g.milestones||[]).filter(m=>m.done).length;
+    const msTotal = (g.milestones||[]).length;
+    return `<div class="goal-card ${isDone?'done':''}" style="animation-delay:${(i*.06).toFixed(2)}s">
+      <div class="goal-header">
+        <div class="goal-icon">${g.icon||'🎯'}</div>
+        <div class="goal-info">
+          <div class="goal-title">${g.title}</div>
+          ${g.why?`<div class="goal-why">Why: ${g.why}</div>`:''}
+        </div>
+        ${isDone?`<div style="font-size:20px">✅</div>`:''}
+      </div>
+      ${g.target>0?`
+      <div class="goal-progress-wrap">
+        <div class="goal-progress-bar"><div class="goal-progress-fill ${isDone?'done':''}" style="width:${pct}%"></div></div>
+        <div class="goal-progress-labels">
+          <span>${g.current} ${g.unit||''}</span>
+          <span style="font-weight:700;color:${isDone?'var(--green)':'var(--gold)'}">${pct}%</span>
+          <span>${g.target} ${g.unit||''}</span>
+        </div>
+      </div>`:''}
+      ${msTotal?`<div style="margin-bottom:10px">${(g.milestones||[]).map(m=>`
+        <div class="goal-milestone">
+          <div class="goal-milestone-dot ${m.done?'done':''}"></div>
+          <span style="text-decoration:${m.done?'line-through':''};color:${m.done?'var(--text3)':'var(--text2)'}">${m.text}</span>
+        </div>`).join('')}</div>`:''}
+      ${!isDone?`<div class="goal-actions">
+        <button class="goal-btn log" onclick="logGoalProgress('${g.id}')">+ Log progress</button>
+        <button class="goal-btn ai"  onclick="goalCoach('${g.id}')">✨ Coach me</button>
+        ${pct>=100?`<button class="goal-btn" style="background:var(--green);color:white" onclick="markGoalDone('${g.id}')">🏆 Done!</button>`:''}
+      </div>`:''}
+    </div>`;
+  };
+
+  list.innerHTML =
+    active.map(renderGoal).join('') +
+    (achieved.length ? `<div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin:16px 0 8px">🏆 Achieved</div>` + achieved.map(renderGoal).join('') : '');
+}
+
+function openGoalEntry() {
+  openSheet('goal');
+}
+
+function saveGoalEntry(text) {
+  if (!text.trim()) return;
+  // Simple parse: first line = title, rest = why
+  const lines = text.split('\n').map(l=>l.trim()).filter(Boolean);
+  const title = lines[0];
+  const why   = lines.slice(1).join(' ');
+  const goal  = {
+    id:         'goal_'+Date.now(),
+    createdAt:  new Date().toISOString(),
+    title, why,
+    icon:       '🎯',
+    target:     0, unit:'', current:0,
+    milestones: [],
+    doneAt:     null
+  };
+  state.goals.unshift(goal);
+  saveAll();
+  renderGoals();
+}
+
+function logGoalProgress(id) {
+  const g = state.goals.find(x=>x.id===id);
+  if (!g) return;
+  const val = prompt(`Log progress for "${g.title}"\nCurrent: ${g.current} ${g.unit}\nTarget: ${g.target} ${g.unit}\n\nEnter new value (or leave blank to +1):`);
+  if (val === null) return;
+  g.current = val.trim() ? Number(val) : g.current + 1;
+  if (!g.target) g.target = g.current;  // auto-set target on first log
+  saveAll();
+  renderGoals();
+}
+
+function markGoalDone(id) {
+  const g = state.goals.find(x=>x.id===id);
+  if (!g) return;
+  g.doneAt = new Date().toISOString();
+  saveAll();
+  renderGoals();
+}
+
+async function goalCoach(id) {
+  const g = state.goals.find(x=>x.id===id);
+  if (!g) return;
+  const pct    = g.target>0 ? Math.round((g.current/g.target)*100) : 0;
+  const prompt = `Life OS goal coaching. Be warm, direct, practical. Max 3 sentences.
+Goal: "${g.title}"
+Why: "${g.why||'not set'}"
+Progress: ${g.current}/${g.target} ${g.unit||''} (${pct}%)
+Context: ${getContext()}
+Give one specific actionable suggestion for the next 48 hours.`;
+  try {
+    const btn = event.target;
+    btn.textContent='✨...'; btn.disabled=true;
+    const text = await callAI('goals', prompt, {maxTokens:200});
+    alert(text);
+    btn.textContent='✨ Coach me'; btn.disabled=false;
+  } catch(e) {
+    alert('Error: '+e.message);
+    event.target.textContent='✨ Coach me'; event.target.disabled=false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// ENERGY TRACKER
+// ═══════════════════════════════════════════════════════
+const ENERGY_EMOJI  = ['','😴','😔','😐','😊','⚡'];
+const ENERGY_LABELS = ['','Very low','Low','Medium','High','Peak'];
+
+function renderEnergy() {
+  renderEnergyHistory();
+  renderEnergyPeak();
+  // Show today's latest log in the dial
+  const today = new Date().toDateString();
+  const todayLogs = state.energy.filter(e => new Date(e.date).toDateString()===today);
+  if (todayLogs.length) {
+    const last = todayLogs[todayLogs.length-1];
+    document.getElementById('energyDial').textContent  = ENERGY_EMOJI[last.level];
+    document.getElementById('energyLabel').textContent = `Last logged: ${ENERGY_LABELS[last.level]}`;
+    highlightEnergyBtn(last.level);
+  }
+}
+
+function logEnergy(level) {
+  const entry = {
+    id:    'en_'+Date.now(),
+    date:  new Date().toISOString(),
+    hour:  new Date().getHours(),
+    level,
+    note:  ''
+  };
+  state.energy.push(entry);
+  saveAll();
+  // Animate dial
+  const dial  = document.getElementById('energyDial');
+  const label = document.getElementById('energyLabel');
+  dial.textContent  = ENERGY_EMOJI[level];
+  dial.style.transform = 'scale(1.3)';
+  setTimeout(() => dial.style.transform='scale(1)', 300);
+  label.textContent = `Logged: ${ENERGY_LABELS[level]} ✓`;
+  highlightEnergyBtn(level);
+  renderEnergyHistory();
+  renderEnergyPeak();
+}
+
+function highlightEnergyBtn(level) {
+  document.querySelectorAll('.energy-btn').forEach((btn,i) => {
+    btn.classList.toggle('active', i+1 === level);
+  });
+}
+
+function renderEnergyHistory() {
+  const hist = document.getElementById('energyHistory');
+  // Last 7 days
+  const days = [];
+  for (let i=6; i>=0; i--) {
+    const d = new Date(); d.setDate(d.getDate()-i); d.setHours(0,0,0,0);
+    const dayStr = d.toDateString();
+    const logs   = state.energy.filter(e=>new Date(e.date).toDateString()===dayStr);
+    const avg    = logs.length ? Math.round(logs.reduce((s,e)=>s+e.level,0)/logs.length) : 0;
+    const label  = d.toLocaleDateString('en-GB',{weekday:'short'}).slice(0,2);
+    days.push({avg, label, count:logs.length});
+  }
+  hist.innerHTML = days.map(d => `
+    <div class="energy-bar-wrap">
+      <div class="energy-bar ${d.avg>0?'filled':''}" style="height:${d.avg>0?Math.round((d.avg/5)*50)+'px':'6px'}"></div>
+      <div class="energy-bar-label">${d.label}${d.avg>0?'<br>'+ENERGY_EMOJI[d.avg]:''}</div>
+    </div>`).join('');
+}
+
+function renderEnergyPeak() {
+  // Find peak hour from all logs
+  const peakEl = document.getElementById('energyPeak');
+  if (state.energy.length < 5) { peakEl.style.display='none'; return; }
+  const byHour = {};
+  state.energy.forEach(e => {
+    if (!byHour[e.hour]) byHour[e.hour]={sum:0,count:0};
+    byHour[e.hour].sum   += e.level;
+    byHour[e.hour].count += 1;
+  });
+  const peak = Object.entries(byHour)
+    .map(([h,v]) => ({hour:Number(h), avg:v.sum/v.count}))
+    .sort((a,b)=>b.avg-a.avg)[0];
+  if (!peak) { peakEl.style.display='none'; return; }
+  const fmt = h => `${h%12||12}${h<12?'am':'pm'}`;
+  peakEl.style.display='flex';
+  document.getElementById('energyPeakLabel').textContent = `Peak hour: ${fmt(peak.hour)}`;
+  document.getElementById('energyPeakText').textContent  = `Average ${ENERGY_LABELS[Math.round(peak.avg)]} energy — schedule demanding work here`;
+}
+
+async function analyseEnergy() {
+  const btn = document.querySelector('#screen-energy .gen-btn');
+  if (!btn) return;
+  btn.textContent='⏳ Analysing...'; btn.disabled=true;
+  const recent = state.energy.slice(-30).map(e=>{
+    const h = new Date(e.date).getHours();
+    return `${h}:00 → ${ENERGY_LABELS[e.level]}`;
+  }).join(', ');
+  const prompt = `Analyse these energy log entries and give practical insights in 3 short paragraphs:
+${recent}
+Context: ${getContext()}
+Focus on: peak hours, low-energy patterns, and 2 specific suggestions to optimise their schedule.`;
+  try {
+    const text = await callAI('energy', prompt, {maxTokens:400});
+    const ins = document.getElementById('energyInsight');
+    ins.style.display='block';
+    ins.innerHTML = text.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+  } catch(e) {
+    alert('Error: '+e.message);
+  }
+  btn.textContent='✨ Analyse my energy patterns'; btn.disabled=false;
+}
+
+// YOGA MODULE
+
+// ═══════════════════════════════════════════════════════
+let yogaSelections = { style:'Hatha', energy:'low', feel:'good' };
+
+function selYogaChip(el, group) {
+  const parent = el.closest('.yoga-chips');
+  parent.querySelectorAll('.yoga-chip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  yogaSelections[group] = el.dataset.val;
+}
+
+function toggleYogaForm() {
+  const f = document.getElementById('yogaLogForm');
+  f.classList.toggle('show');
+}
+
+function renderYoga() {
+  const sessions = state.yoga || [];
+  const totalMin = sessions.reduce((s,y)=>s+(y.duration||0),0);
+
+  // Streak calc
+  let streak = 0;
+  const sorted = [...sessions].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if (sorted.length) {
+    let check = new Date(); check.setHours(0,0,0,0);
+    for (const s of sorted) {
+      const d = new Date(s.date); d.setHours(0,0,0,0);
+      if (d.getTime() >= check.getTime() - 86400000) { streak++; check = d; }
+      else break;
+    }
+  }
+
+  document.getElementById('yogaTotal').textContent   = sessions.length;
+  document.getElementById('yogaMinutes').textContent = totalMin;
+  document.getElementById('yogaStreak').textContent  = streak;
+
+  renderYogaSessions();
+}
+
+function renderYogaSessions() {
+  const el = document.getElementById('yogaSessions');
+  const sessions = state.yoga || [];
+  if (!sessions.length) {
+    el.innerHTML=`<div style="color:var(--text3);font-size:13px;text-align:center;padding:24px 0">No sessions yet — log your first practice above.</div>`;
+    return;
+  }
+  el.innerHTML = sessions.slice(0,20).map(s => {
+    const d = new Date(s.date).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+    const feelEmoji = {challenging:'💪',good:'🙂',effortless:'🌊',struggled:'😤'}[s.feel]||'🙂';
+    const energyEmoji = {low:'😔',medium:'😐',high:'⚡'}[s.energy_before]||'😐';
+    return `<div class="yoga-session-card">
+      <div class="ysc-head">
+        <span class="ysc-style">${s.style}</span>
+        <span class="ysc-date">${d}</span>
+        <span class="ysc-duration">${s.duration}m</span>
+      </div>
+      <div class="ysc-body">${energyEmoji} Before · ${feelEmoji} Felt ${s.feel}${s.notes?` · ${s.notes.slice(0,60)}`:''}</div>
+      ${s.ai_observation?`<div style="font-size:12px;color:var(--blue);margin-top:6px;font-style:italic">${s.ai_observation}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+async function saveYogaSession() {
+  const duration = parseInt(document.getElementById('yogaDuration').value);
+  const notes    = document.getElementById('yogaNotes').value.trim();
+
+  const session = {
+    id:            'yoga_'+Date.now(),
+    date:          new Date().toISOString(),
+    style:         yogaSelections.style,
+    duration,
+    energy_before: yogaSelections.energy,
+    feel:          yogaSelections.feel,
+    notes,
+    ai_observation:''
+  };
+
+  if (!state.yoga) state.yoga = [];
+  state.yoga.unshift(session);
+
+  // Mark yoga habit as done if it exists
+  const yogaHabit = state.habits.find(h=>h.name.toLowerCase().includes('yoga'));
+  if (yogaHabit && !yogaHabit.doneToday) {
+    yogaHabit.doneToday = true;
+    yogaHabit.streak++;
+  }
+
+  save(); renderYoga(); toggleYogaForm();
+  document.getElementById('yogaNotes').value = '';
+  refreshHome();
+
+  // Async AI observation
+  generateYogaObservation(session.id);
+}
+
+async function generateYogaObservation(sessionId) {
+  const sessions = (state.yoga||[]).slice(0,10);
+  const context  = sessions.slice(1).map(s=>`${s.style} ${s.duration}min — felt ${s.feel}`).join(', ');
+  try {
+    const yogaPrompt = `Yoga practitioner just logged: ${sessions[0]?.style} ${sessions[0]?.duration}min, energy before: ${sessions[0]?.energy_before}, felt: ${sessions[0]?.feel}. Notes: "${sessions[0]?.notes||'none'}". Recent history: ${context||'first session'}. Write ONE short encouraging observation (1-2 sentences, max 20 words). Be specific and personal. No preamble.`;
+    const text = await callAI('yoga', yogaPrompt, {maxTokens:120});
+    const idx  = (state.yoga||[]).findIndex(s=>s.id===sessionId);
+    if (idx>=0) { state.yoga[idx].ai_observation=text.trim(); save(); renderYogaSessions(); }
+  } catch(_){}
+}
+
+async function getYogaInsight() {
+  const el  = document.getElementById('yogaInsightEl');
+  const btn = document.querySelector('#screen-yoga .icon-btn');
+  btn.textContent='...'; btn.disabled=true;
+  el.innerHTML='';
+
+  const sessions = (state.yoga||[]).slice(0,20);
+  if (!sessions.length) { el.innerHTML=`<div class="yoga-insight">Log a few sessions first — insights will appear here.</div>`; btn.textContent='✨ Insight'; btn.disabled=false; return; }
+
+  const summary = sessions.map(s=>`${s.style} ${s.duration}min, ${s.feel}, energy:${s.energy_before}`).join(' | ');
+  try {
+    const insightPrompt = `${getContext()}\n\nYoga practice history (most recent first): ${summary}\n\nGive ONE insightful observation about this practice. Notice patterns (energy levels, styles, consistency, what feels good). 2-3 sentences. Personal and specific. No preamble.`;
+    const text = await callAI('yoga', insightPrompt, {maxTokens:200});
+    el.innerHTML=`<div class="yoga-insight" style="animation:popIn .3s ease"><strong>Practice insight</strong><br><br>${text}</div>`;
+  } catch(e) {
+    el.innerHTML=`<div class="yoga-insight" style="color:var(--red)">Error: ${e.message}</div>`;
+  }
+  btn.textContent='✨ Insight'; btn.disabled=false;
+}
+
+// ═══════════════════════════════════════════════════════
+// DAILY RESET (extracted so PIN can call it)
+// ═══════════════════════════════════════════════════════
+function dailyHabitReset() {
+  const today   = new Date().toDateString();
+  const lastDay = localStorage.getItem('los_lastday');
+  if (lastDay !== today) {
+    state.habits.forEach(h => h.doneToday=false);
+    if (state.meds) state.meds.forEach(m => m.doneToday=false);
+    localStorage.setItem('los_lastday', today);
+    save();
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+async function init() {
+  initFileBar();
+  const pinIsSet = localStorage.getItem(PIN_SET_KEY);
+  if (!pinIsSet) {
+    loadFromLS(); // load any existing plain data
+    showPin(true);
+  } else {
+    showPin(false);
+    // loadDecrypted() called after PIN entry
+  }
+}
+
+init();
+
+document.addEventListener('keydown', e => {
+  if (e.key==='Escape') closeSheet();
+  if ((e.ctrlKey||e.metaKey)&&e.key==='Enter'&&document.getElementById('sheetOverlay').classList.contains('open')) saveCapture();
+  // PIN keyboard support
+  if (document.getElementById('pinScreen').classList.contains('show')) {
+    if (e.key>='0'&&e.key<='9') pinPress(e.key);
+    if (e.key==='Backspace') pinDel();
+  }
+});
+
+// ── Service Worker Registration ───────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      const reg = await navigator.serviceWorker.register('./sw.js');
+      console.log('[Life OS] SW registered:', reg.scope);
+
+      // Handle shared content from other apps (share_target)
+      navigator.serviceWorker.addEventListener('message', event => {
+        if (event.data?.type === 'SHARE_TARGET') {
+          const text = [event.data.text, event.data.url].filter(Boolean).join(' ');
+          if (text) {
+            openSheet();
+            setTimeout(() => { document.getElementById('sheetText').value = text; }, 400);
+          }
+        }
+      });
+
+      // Also handle share_target GET redirect params directly
+      const params = new URLSearchParams(window.location.search);
+      const st = params.get('share_text'), su = params.get('share_url');
+      if (st || su) {
+        const combined = [st, su].filter(Boolean).join(' ');
+        setTimeout(() => {
+          openSheet();
+          setTimeout(() => { document.getElementById('sheetText').value = combined; }, 400);
+        }, 800);
+        window.history.replaceState({}, '', './lifeOS.html');
+      }
+    } catch (err) {
+      console.warn('[Life OS] SW failed:', err);
+    }
+  });
+}
+
+// ── Install prompt ────────────────────────────────────
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const btn = document.getElementById('installBtn');
+  if (btn) btn.style.display = 'flex';
+});
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  const btn = document.getElementById('installBtn');
+  if (btn) btn.style.display = 'none';
+});
+function promptInstall() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(() => { deferredInstallPrompt = null; });
+  }
+}
+
+// ── Version display ───────────────────────────────────
+function showAppVersion() {
+  const meta = document.getElementById('app-version');
+  const el   = document.getElementById('aboutVersion');
+  if (!meta || !el) return;
+  const v = meta.getAttribute('content') || 'unknown';
+  const d = new Date(v);
+  const fmt = d.toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
+  el.textContent = 'Updated ' + fmt + ' · API Manager · PIN · Multi-provider AI';
+}
+
+showAppVersion();
+
+</script>
+</body>
+</html>

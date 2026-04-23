@@ -1906,7 +1906,7 @@ function autoSelectProvider(opts={}) {
   }
   // Cloud fallback
   if (opts.search) {
-    const searchCloud = ['claude','gemini','perplexity'].find(k => apiKeys[k]);
+    const searchCloud = ['groq','claude','gemini','perplexity'].find(k => apiKeys[k]);
     if (searchCloud) return searchCloud;
   }
   const anyCloud = Object.keys(PROVIDERS)

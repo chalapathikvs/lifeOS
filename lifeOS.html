@@ -1605,7 +1605,7 @@ const PROVIDERS = {
   gemini: {
     name:      'gemini',
     label:     'Gemini',
-    subtitle:  'Gemini 2.0 Flash — fast & multimodal',
+    subtitle:  'Gemini 2.5 Flash — fast & multimodal',
     icon:      '✨',
     type:      'cloud',
     strengths: ['Very fast','Google Search','Long context','Multimodal'],
@@ -1628,7 +1628,7 @@ const PROVIDERS = {
       const body = { contents:[{ parts }] };
       if (opts.search) body.tools = [{ google_search: {} }];
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,
         { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) }
       );
       const d = await res.json();

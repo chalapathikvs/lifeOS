@@ -121,6 +121,11 @@ self.addEventListener('push', event => {
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   event.waitUntil(
-    self.clients.openWindow(event.notification.data?.url || './lifeOS.html')
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
+      // Focus existing window if open
+      const existing = clients.find(c => c.url.includes('lifeOS'));
+      if (existing) return existing.focus();
+      return self.clients.openWindow(event.notification.data?.url || './lifeOS.html');
+    })
   );
 });

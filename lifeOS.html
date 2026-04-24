@@ -1605,7 +1605,7 @@ const PROVIDERS = {
   gemini: {
     name:      'gemini',
     label:     'Gemini',
-    subtitle:  'Gemini 2.5 Flash — fast & multimodal',
+    subtitle:  'Gemini 2.5 Flash Lite — fast & multimodal',
     icon:      '✨',
     type:      'cloud',
     strengths: ['Very fast','Google Search','Long context','Multimodal'],
@@ -1628,7 +1628,7 @@ const PROVIDERS = {
       const body = { contents:[{ parts }] };
       if (opts.search) body.tools = [{ google_search: {} }];
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${key}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite-preview-06-17:generateContent?key=${key}`,
         { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) }
       );
       const d = await res.json();
@@ -1834,14 +1834,15 @@ function isProviderAvailable(name) {
 async function callAI(module, prompt, opts={}) {
   // Build priority chain:
   // 1. Explicit override in opts
-  // 2. Module routing config
+  // 2. Module routing config (respected even if provider lacks search)
   // 3. Auto-select: prefer local if available and capable
   // 4. Any available provider as fallback
   // 5. Error
 
-  let providerName = opts.provider || moduleRouting[module];
+  const explicitProvider = opts.provider || (moduleRouting[module] !== 'auto' ? moduleRouting[module] : null);
+  let providerName = explicitProvider;
 
-  // If routing says 'auto', pick the best available
+  // If routing says 'auto' (or unset), pick the best available
   if (!providerName || providerName === 'auto') {
     providerName = autoSelectProvider(opts);
   }
@@ -1850,23 +1851,37 @@ async function callAI(module, prompt, opts={}) {
   const tried = new Set();
   let lastError;
 
-  const tryProvider = async (name) => {
+  const tryProvider = async (name, callOpts) => {
+    callOpts = callOpts || opts;
     if (tried.has(name)) return null;
     tried.add(name);
     const p = PROVIDERS[name];
     if (!p) return null;
     if (p.type === 'local' && !localProviderStatus[name]) return null;
     if (p.type === 'cloud' && !apiKeys[name]) return null;
-    if (opts.search && !p.hasSearch) return null;
-    if (opts.images && !p.hasVision) return null;
+    if (callOpts.search && !p.hasSearch) return null;
+    if (callOpts.images && !p.hasVision) return null;
     try {
-      return await p.call(apiKeys[name] || '', prompt, opts);
+      return await p.call(apiKeys[name] || '', prompt, callOpts);
     } catch(e) {
       lastError = e;
       console.warn(`[callAI] ${name} failed:`, e.message);
       return null;
     }
   };
+
+  // If user explicitly set a provider but it lacks search capability,
+  // respect their choice and run without live search rather than silently
+  // falling back to a different provider (e.g. Gemini).
+  if (explicitProvider) {
+    const p = PROVIDERS[explicitProvider];
+    if (p && opts.search && !p.hasSearch && apiKeys[explicitProvider]) {
+      console.info(`[callAI] ${explicitProvider} has no web search — running without live search as you configured`);
+      const noSearchOpts = { ...opts, search: false };
+      const r = await tryProvider(explicitProvider, noSearchOpts);
+      if (r !== null) return r;
+    }
+  }
 
   // Try primary
   let result = await tryProvider(providerName);
@@ -1906,7 +1921,7 @@ function autoSelectProvider(opts={}) {
   }
   // Cloud fallback
   if (opts.search) {
-    const searchCloud = ['groq','claude','gemini','perplexity'].find(k => apiKeys[k]);
+    const searchCloud = ['claude','gemini','perplexity'].find(k => apiKeys[k]);
     if (searchCloud) return searchCloud;
   }
   const anyCloud = Object.keys(PROVIDERS)
@@ -2173,24 +2188,30 @@ function renderModuleRouting() {
     { id:'goals',    icon:'🎯', name:'Goal Tracker' },
   ];
 
-  const options = Object.values(PROVIDERS).map(p =>
-    `<option value="${p.name}" ${!apiKeys[p.name] ? 'disabled' : ''}>${p.icon} ${p.label}${!apiKeys[p.name] ? ' (no key)' : ''}</option>`
-  ).join('');
+  // Modules that require web search
+  const searchModules = new Set(['intel','stocks','briefing']);
 
-  el.innerHTML = modules.map(m => `
+  el.innerHTML = modules.map(m => {
+    const needsSearch = searchModules.has(m.id);
+    return `
     <div class="routing-row">
       <div class="routing-icon">${m.icon}</div>
-      <div class="routing-name">${m.name}</div>
+      <div class="routing-name">${m.name}${needsSearch ? ' <span style="font-size:10px;color:var(--text3);font-weight:400">(uses web search)</span>' : ''}</div>
       <select class="routing-select" onchange="setModuleProvider('${m.id}',this.value)">
-        ${Object.values(PROVIDERS).map(p =>
-          `<option value="${p.name}"
+        <option value="auto" ${moduleRouting[m.id] === 'auto' ? 'selected' : ''}>⚙️ Auto</option>
+        ${Object.values(PROVIDERS).filter(p => p.type === 'cloud').map(p => {
+          const noKey = !apiKeys[p.name];
+          const noSearch = needsSearch && !p.hasSearch;
+          const label = p.icon + ' ' + p.label + (noKey ? ' (no key)' : noSearch ? ' (no search→text only)' : '');
+          return `<option value="${p.name}"
             ${moduleRouting[m.id] === p.name ? 'selected' : ''}
-            ${!apiKeys[p.name] ? 'disabled' : ''}>
-            ${p.icon} ${p.label}${!apiKeys[p.name] ? ' (no key)' : ''}
-          </option>`
-        ).join('')}
+            ${noKey ? 'disabled' : ''}>
+            ${label}
+          </option>`;
+        }).join('')}
       </select>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function setModuleProvider(module, provider) {

@@ -1087,13 +1087,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
   <button class="nav-item"        id="nav-review"  onclick="navTo('review')">  <span class="nav-icon">◎</span><span class="nav-label">Review</span></button>
   <button class="nav-item"        id="nav-settings"onclick="navTo('settings')"><span class="nav-icon">◈</span><span class="nav-label">Settings</span></button>
 </nav>
-</div>
 
 <!-- ══ FINANCE TRACKER ══════════════════════════════════ -->
 <div id="screen-finance" class="screen">
   <div class="topbar">
     <div class="topbar-left"><div class="topbar-title">💰 Finance</div><div class="topbar-sub">Income, expenses & cashflow</div></div>
     <div class="topbar-right"><button class="icon-btn" onclick="openFinanceEntry()">＋</button></div>
+  </div>
   <div class="scroll-area">
     <div class="fin-wrap">
       <div class="fin-summary">
@@ -1112,7 +1112,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
         <div class="fin-cat" onclick="filterFinance('other',this)">📦 Other</div>
       </div>
       <div id="finList"></div>
-      </div>
     </div>
   </div>
 </div>
@@ -1162,6 +1161,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     </div>
   </div>
 </div>
+
+</div><!-- /#app -->
 
 <!-- ══ CAPTURE SHEET ══════════════════════════════════ -->
 <div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>

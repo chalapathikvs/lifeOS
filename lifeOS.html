@@ -501,6 +501,50 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .fin-cat{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid var(--border);background:var(--surface);color:var(--text3);cursor:pointer;white-space:nowrap;transition:all .15s}
 .fin-cat.active{border-color:var(--gold);background:rgba(201,168,76,.1);color:var(--gold)}
 
+/* ── Purchases ── */
+.fin-tab-row{display:flex;border-bottom:1px solid var(--border);margin-bottom:14px;flex-shrink:0}
+.fin-tab{flex:1;padding:10px 0;text-align:center;font-size:13px;font-weight:700;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.fin-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.pur-search{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:var(--r);padding:9px 14px;font-size:13px;font-family:var(--sans);margin-bottom:12px;outline:none;transition:border-color .15s}
+.pur-search:focus{border-color:var(--gold)}
+.pur-entry{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;animation:fadeUp .25s ease both;cursor:pointer;transition:border-color .15s}
+.pur-entry:active{border-color:var(--gold)}
+.pur-entry-head{display:flex;align-items:flex-start;gap:12px}
+.pur-entry-icon{font-size:24px;flex-shrink:0;margin-top:2px}
+.pur-entry-info{flex:1;min-width:0}
+.pur-entry-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px}
+.pur-entry-meta{font-size:11px;color:var(--text3);margin-bottom:4px}
+.pur-entry-amt{font-size:15px;font-weight:700;color:var(--text2);flex-shrink:0}
+.pur-warranty{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:10px;margin-top:4px}
+.pur-warranty.active{background:rgba(109,186,127,.12);color:var(--green)}
+.pur-warranty.expiring{background:rgba(201,168,76,.12);color:var(--gold)}
+.pur-warranty.expired{background:rgba(212,101,90,.12);color:var(--red)}
+.pur-warranty.none{background:var(--bg3);color:var(--text3)}
+.pur-files{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.pur-file-btn{background:var(--bg2);border:1px solid var(--border);color:var(--text3);border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:var(--sans);transition:all .15s}
+.pur-file-btn:active{border-color:var(--gold);color:var(--gold)}
+.pur-notes{font-size:12px;color:var(--text3);line-height:1.5;margin-top:6px;font-style:italic}
+/* Purchase modal */
+.pur-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;align-items:flex-end;justify-content:center}
+.pur-modal-overlay.open{display:flex}
+.pur-modal{background:var(--bg2);border-radius:16px 16px 0 0;padding:20px 20px 40px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.pur-modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px}
+.pur-modal-title{font-family:var(--serif);font-size:18px;font-weight:300;color:var(--text);margin-bottom:16px}
+.pur-field{margin-bottom:12px}
+.pur-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.pur-input{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:var(--r);padding:10px 14px;font-size:14px;font-family:var(--sans);outline:none;transition:border-color .15s}
+.pur-input:focus{border-color:var(--gold)}
+.pur-input-row{display:flex;gap:8px}
+.pur-input-row .pur-input{flex:1}
+.pur-upload-row{display:flex;gap:8px;margin-bottom:12px}
+.pur-upload-btn{flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:var(--r);padding:10px;font-size:12px;font-family:var(--sans);cursor:pointer;text-align:center;transition:all .15s}
+.pur-upload-btn:active{border-color:var(--gold);color:var(--gold)}
+.pur-attached{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.pur-attached-item{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--text2);display:flex;align-items:center;gap:6px}
+.pur-attached-del{color:var(--text3);cursor:pointer;font-size:13px}
+.pur-save-btn{width:100%;background:var(--gold);color:#1a1500;border:none;border-radius:var(--r);padding:14px;font-size:14px;font-weight:700;font-family:var(--sans);cursor:pointer;margin-top:4px}
+.pur-save-btn:active{opacity:.85}
+
 /* ── Goal Tracker ── */
 .goal-wrap{padding:16px 20px}
 .goal-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;animation:fadeUp .25s ease both}
@@ -1091,10 +1135,16 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 <!-- ══ FINANCE TRACKER ══════════════════════════════════ -->
 <div id="screen-finance" class="screen">
   <div class="topbar">
-    <div class="topbar-left"><div class="topbar-title">💰 Finance</div><div class="topbar-sub">Income, expenses & cashflow</div></div>
-    <div class="topbar-right"><button class="icon-btn" onclick="openFinanceEntry()">＋</button></div>
+    <div class="topbar-left"><div class="topbar-title">💰 Finance</div><div class="topbar-sub" id="finTopbarSub">Income, expenses & cashflow</div></div>
+    <div class="topbar-right"><button class="icon-btn" id="finAddBtn" onclick="openFinanceEntry()">＋</button></div>
   </div>
-  <div class="scroll-area">
+  <!-- Tabs -->
+  <div class="fin-tab-row">
+    <div class="fin-tab active" id="finTab-cashflow" onclick="switchFinTab('cashflow',this)">Cashflow</div>
+    <div class="fin-tab" id="finTab-purchases" onclick="switchFinTab('purchases',this)">🧾 Purchases</div>
+  </div>
+  <!-- Cashflow panel -->
+  <div class="scroll-area" id="finPanel-cashflow">
     <div class="fin-wrap">
       <div class="fin-summary">
         <div class="fin-stat"><div class="fin-stat-val income" id="finIncome">₹0</div><div class="fin-stat-key">Income</div></div>
@@ -1113,6 +1163,54 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       </div>
       <div id="finList"></div>
     </div>
+  </div>
+  <!-- Purchases panel -->
+  <div class="scroll-area" id="finPanel-purchases" style="display:none">
+    <div class="fin-wrap">
+      <input class="pur-search" type="search" placeholder="🔍  Search purchases…" oninput="renderPurchases(this.value)" id="purSearch">
+      <div id="purList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PURCHASE MODAL ═══════════════════════════════════ -->
+<div class="pur-modal-overlay" id="purModalOverlay" onclick="closePurModal(event)">
+  <div class="pur-modal" id="purModal">
+    <div class="pur-modal-handle"></div>
+    <div class="pur-modal-title" id="purModalTitle">New Purchase</div>
+    <div class="pur-field">
+      <div class="pur-label">Item name</div>
+      <input class="pur-input" id="purName" placeholder="e.g. MacBook Pro, Sony WH-1000XM5">
+    </div>
+    <div class="pur-field">
+      <div class="pur-label">Brand / Store</div>
+      <div class="pur-input-row">
+        <input class="pur-input" id="purBrand" placeholder="Brand">
+        <input class="pur-input" id="purStore" placeholder="Store / Platform">
+      </div>
+    </div>
+    <div class="pur-field">
+      <div class="pur-label">Amount & Date</div>
+      <div class="pur-input-row">
+        <input class="pur-input" id="purAmount" type="number" placeholder="₹ Amount">
+        <input class="pur-input" id="purDate" type="date">
+      </div>
+    </div>
+    <div class="pur-field">
+      <div class="pur-label">Warranty expiry <span style="color:var(--text3);font-weight:400;text-transform:none">(optional)</span></div>
+      <input class="pur-input" id="purWarranty" type="date">
+    </div>
+    <div class="pur-field">
+      <div class="pur-label">Notes / Reflection</div>
+      <textarea class="pur-input" id="purNotes" rows="3" placeholder="Why you bought it, how it's working out…" style="resize:none;line-height:1.5"></textarea>
+    </div>
+    <div class="pur-label" style="margin-bottom:8px">Attachments</div>
+    <div class="pur-upload-row">
+      <label class="pur-upload-btn">📷 Receipt<input type="file" accept="image/*,application/pdf" style="display:none" onchange="attachPurFile(this,'receipt')"></label>
+      <label class="pur-upload-btn">🛡️ Warranty card<input type="file" accept="image/*,application/pdf" style="display:none" onchange="attachPurFile(this,'warranty')"></label>
+    </div>
+    <div class="pur-attached" id="purAttached"></div>
+    <button class="pur-save-btn" onclick="savePurchase()">Save Purchase</button>
   </div>
 </div>
 
@@ -1204,6 +1302,7 @@ let state = {
   finance: [],  // {id, date, type:'income'|'expense', amount, desc, category, note}
   goals:   [],  // {id, title, why, icon, target, unit, current, milestones:[], createdAt, doneAt}
   energy:  [],  // {id, date, hour, level:1-5, note}
+  purchases: [], // {id, date, name, brand, store, amount, warrantyExpiry, notes, files:[{label,filePath,mimeType}]}
 };
 
 
@@ -3180,7 +3279,7 @@ function exportAll() { exportFallback(); }
 function clearAll() {
   if(!confirm('Clear ALL Life OS data?')) return;
   const ctx=state.context;
-  state={context:ctx,captures:[],habits:state.habits,intel:[],stocks:[],health:[],journal:[],meds:state.meds,yoga:[],briefing:{date:'',what:'',why:'',topic:''},finance:[],goals:[],energy:[]};
+  state={context:ctx,captures:[],habits:state.habits,intel:[],stocks:[],health:[],journal:[],meds:state.meds,yoga:[],briefing:{date:'',what:'',why:'',topic:''},finance:[],goals:[],energy:[],purchases:[]};
   save(); refreshHome();
 }
 
@@ -3494,6 +3593,247 @@ Amount should be a number without currency symbol. If unclear, default to expens
   state.finance.unshift(entry);
   saveAll();
   renderFinance();
+}
+
+// ═══════════════════════════════════════════════════════
+// PURCHASES
+// ═══════════════════════════════════════════════════════
+
+let purPendingFiles = []; // [{label, base64, mimeType, name}]
+let purEditId = null;
+let finActiveTab = 'cashflow';
+
+function switchFinTab(tab, el) {
+  finActiveTab = tab;
+  document.querySelectorAll('.fin-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('finPanel-cashflow').style.display  = tab === 'cashflow'  ? '' : 'none';
+  document.getElementById('finPanel-purchases').style.display = tab === 'purchases' ? '' : 'none';
+  const addBtn = document.getElementById('finAddBtn');
+  const sub    = document.getElementById('finTopbarSub');
+  if (tab === 'purchases') {
+    addBtn.onclick = openPurModal;
+    sub.textContent = 'Receipts & warranty vault';
+    renderPurchases();
+  } else {
+    addBtn.onclick = openFinanceEntry;
+    sub.textContent = 'Income, expenses & cashflow';
+  }
+}
+
+function warrantyStatus(expiry) {
+  if (!expiry) return { label: 'No warranty', cls: 'none' };
+  const now   = new Date();
+  const exp   = new Date(expiry);
+  const days  = Math.round((exp - now) / 86400000);
+  if (days < 0)   return { label: 'Warranty expired', cls: 'expired' };
+  if (days <= 30) return { label: `Expires in ${days}d`, cls: 'expiring' };
+  const months = Math.round(days / 30);
+  return { label: `${months}mo warranty left`, cls: 'active' };
+}
+
+function renderPurchases(query = '') {
+  const el = document.getElementById('purList');
+  if (!el) return;
+  let list = [...(state.purchases || [])].reverse();
+  if (query.trim()) {
+    const q = query.toLowerCase();
+    list = list.filter(p =>
+      (p.name  || '').toLowerCase().includes(q) ||
+      (p.brand || '').toLowerCase().includes(q) ||
+      (p.store || '').toLowerCase().includes(q) ||
+      (p.notes || '').toLowerCase().includes(q)
+    );
+  }
+  if (!list.length) {
+    el.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text3)">
+      <div style="font-size:40px;margin-bottom:10px">🧾</div>
+      <div style="font-size:14px">${query ? 'No matches found' : 'No purchases yet — tap ＋ to add one'}</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML = list.map((p, i) => {
+    const ws  = warrantyStatus(p.warrantyExpiry);
+    const d   = new Date(p.date).toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
+    const amt = p.amount ? '₹' + Number(p.amount).toLocaleString('en-IN') : '';
+    const files = (p.files || []).map(f =>
+      `<button class="pur-file-btn" onclick="openPurFile(event,'${p.id}','${f.filePath}')">${f.mimeType==='application/pdf'?'📄':'🖼️'} ${f.label}</button>`
+    ).join('');
+    return `<div class="pur-entry" style="animation-delay:${(i*.04).toFixed(2)}s" onclick="openPurDetail('${p.id}')">
+      <div class="pur-entry-head">
+        <div class="pur-entry-icon">🧾</div>
+        <div class="pur-entry-info">
+          <div class="pur-entry-name">${p.name || 'Unnamed item'}</div>
+          <div class="pur-entry-meta">${[p.brand, p.store, d].filter(Boolean).join(' · ')}</div>
+          <div class="pur-warranty ${ws.cls}">● ${ws.label}</div>
+          ${p.notes ? `<div class="pur-notes">${p.notes.slice(0,100)}${p.notes.length>100?'…':''}</div>` : ''}
+        </div>
+        ${amt ? `<div class="pur-entry-amt">${amt}</div>` : ''}
+      </div>
+      ${files ? `<div class="pur-files">${files}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function openPurModal(editId = null) {
+  purEditId       = editId;
+  purPendingFiles = [];
+  const modal = document.getElementById('purModalOverlay');
+  const title = document.getElementById('purModalTitle');
+
+  if (editId) {
+    const p = state.purchases.find(x => x.id === editId);
+    if (!p) return;
+    title.textContent = 'Edit Purchase';
+    document.getElementById('purName').value     = p.name     || '';
+    document.getElementById('purBrand').value    = p.brand    || '';
+    document.getElementById('purStore').value    = p.store    || '';
+    document.getElementById('purAmount').value   = p.amount   || '';
+    document.getElementById('purDate').value     = p.date     ? p.date.slice(0,10) : '';
+    document.getElementById('purWarranty').value = p.warrantyExpiry || '';
+    document.getElementById('purNotes').value    = p.notes    || '';
+  } else {
+    title.textContent = 'New Purchase';
+    document.getElementById('purName').value     = '';
+    document.getElementById('purBrand').value    = '';
+    document.getElementById('purStore').value    = '';
+    document.getElementById('purAmount').value   = '';
+    document.getElementById('purDate').value     = new Date().toISOString().slice(0,10);
+    document.getElementById('purWarranty').value = '';
+    document.getElementById('purNotes').value    = '';
+  }
+  renderPurAttached();
+  modal.classList.add('open');
+  setTimeout(() => document.getElementById('purName').focus(), 100);
+}
+
+function closePurModal(e) {
+  if (e && e.target !== document.getElementById('purModalOverlay')) return;
+  document.getElementById('purModalOverlay').classList.remove('open');
+  purPendingFiles = [];
+  purEditId = null;
+}
+
+function closePurModalDirect() {
+  document.getElementById('purModalOverlay').classList.remove('open');
+  purPendingFiles = [];
+  purEditId = null;
+}
+
+function attachPurFile(input, label) {
+  const file = input.files[0]; if (!file) return; input.value = '';
+  const reader = new FileReader();
+  reader.onload = () => {
+    const base64 = reader.result.split(',')[1];
+    // Remove existing file of same label
+    purPendingFiles = purPendingFiles.filter(f => f.label !== label);
+    purPendingFiles.push({ label, base64, mimeType: file.type, name: file.name });
+    renderPurAttached();
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderPurAttached() {
+  const el = document.getElementById('purAttached');
+  if (!el) return;
+  el.innerHTML = purPendingFiles.map((f, i) =>
+    `<div class="pur-attached-item">
+      ${f.mimeType === 'application/pdf' ? '📄' : '🖼️'} ${f.label}: ${f.name}
+      <span class="pur-attached-del" onclick="removePurFile(${i})">✕</span>
+    </div>`
+  ).join('');
+}
+
+function removePurFile(i) {
+  purPendingFiles.splice(i, 1);
+  renderPurAttached();
+}
+
+// Generate obfuscated filename from purchase id + label using SHA-256
+async function obfuscatedFilename(purId, label, mimeType) {
+  const ext = mimeType === 'application/pdf' ? 'pdf'
+            : mimeType === 'image/png'        ? 'png'
+            : mimeType === 'image/webp'       ? 'webp' : 'jpg';
+  const raw  = purId + ':' + label;
+  const buf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw));
+  const hex  = Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,24);
+  return `${hex}.${ext}`;
+}
+
+async function savePurchase() {
+  const name     = document.getElementById('purName').value.trim();
+  if (!name) { document.getElementById('purName').focus(); return; }
+
+  const id       = purEditId || ('pur_' + Date.now());
+  const existing = purEditId ? state.purchases.find(p => p.id === purEditId) : null;
+
+  const entry = {
+    id,
+    date:           document.getElementById('purDate').value     || new Date().toISOString().slice(0,10),
+    name,
+    brand:          document.getElementById('purBrand').value.trim(),
+    store:          document.getElementById('purStore').value.trim(),
+    amount:         parseFloat(document.getElementById('purAmount').value) || 0,
+    warrantyExpiry: document.getElementById('purWarranty').value || '',
+    notes:          document.getElementById('purNotes').value.trim(),
+    files:          existing ? [...(existing.files || [])] : [],
+  };
+
+  // Save pending files to folder with obfuscated names
+  for (const f of purPendingFiles) {
+    // Remove old file of same label if editing
+    entry.files = entry.files.filter(x => x.label !== f.label);
+    const filename = await obfuscatedFilename(id, f.label, f.mimeType);
+    const filePath = await savePurFile(filename, f.base64, f.mimeType);
+    entry.files.push({ label: f.label, filePath: filePath || null, mimeType: f.mimeType });
+  }
+
+  if (purEditId) {
+    const idx = state.purchases.findIndex(p => p.id === purEditId);
+    if (idx !== -1) state.purchases[idx] = entry;
+  } else {
+    state.purchases.push(entry);
+  }
+
+  save();
+  closePurModalDirect();
+  renderPurchases(document.getElementById('purSearch')?.value || '');
+}
+
+async function savePurFile(filename, base64, mimeType) {
+  if (!dirHandle) return null;
+  try {
+    const filesDir = await dirHandle.getDirectoryHandle('files', {create:true});
+    const fh       = await filesDir.getFileHandle(filename, {create:true});
+    const writable = await fh.createWritable();
+    const binary   = atob(base64);
+    const bytes    = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    await writable.write(bytes);
+    await writable.close();
+    return `files/${filename}`;
+  } catch(e) {
+    console.warn('[LifeOS] Purchase file save failed:', e.message);
+    return null;
+  }
+}
+
+async function openPurFile(evt, purId, filePath) {
+  evt.stopPropagation();
+  if (!filePath) { showFileToast('File not saved to folder — please relink your folder and re-attach.'); return; }
+  openRawFile(filePath);
+}
+
+function openPurDetail(id) {
+  openPurModal(id);
+}
+
+function deletePurchase(id) {
+  if (!confirm('Delete this purchase?')) return;
+  state.purchases = state.purchases.filter(p => p.id !== id);
+  save();
+  closePurModalDirect();
+  renderPurchases(document.getElementById('purSearch')?.value || '');
 }
 
 // ═══════════════════════════════════════════════════════

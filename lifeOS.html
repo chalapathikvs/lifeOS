@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Life OS">
 <meta name="theme-color" content="#0f0e0c">
-<meta name="app-version" content="2026-04-19" id="app-version">
+<meta name="app-version" content="2026-09-06" id="app-version">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="Your personal operating system">
 <title>Life OS</title>
@@ -4095,6 +4095,23 @@ if ('serviceWorker' in navigator) {
       const reg = await navigator.serviceWorker.register('./sw.js');
       console.log('[Life OS] SW registered:', reg.scope);
 
+      // Proactively check for SW updates on every load
+      reg.update().then(() => {
+        console.log('[Life OS] SW update check done');
+      });
+
+      // When a new SW is waiting, activate it immediately
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        newWorker?.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // New SW ready — reload to get fresh HTML
+            console.log('[Life OS] New version available, reloading...');
+            window.location.reload();
+          }
+        });
+      });
+
       // Handle shared content from other apps (share_target)
       navigator.serviceWorker.addEventListener('message', event => {
         if (event.data?.type === 'SHARE_TARGET') {
@@ -4151,7 +4168,7 @@ function showAppVersion() {
   const v = meta.getAttribute('content') || 'unknown';
   const d = new Date(v);
   const fmt = d.toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
-  el.textContent = 'Updated ' + fmt + ' · API Manager · PIN · Multi-provider AI';
+  el.textContent = 'Build ' + v + ' · ' + fmt + ' · Multi-provider AI';
 }
 
 showAppVersion();

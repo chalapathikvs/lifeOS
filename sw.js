@@ -3,9 +3,8 @@
 
 const CACHE_NAME = 'lifeos-2026-09-06';
 
-// Files to cache on install — the complete app shell
+// Files to cache on install — everything EXCEPT lifeOS.html (network-first)
 const CACHE_FILES = [
-  './lifeOS.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
@@ -16,11 +15,8 @@ const CACHE_FILES = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      // Cache what we can — don't fail install if fonts are unavailable
       return cache.addAll(CACHE_FILES).catch(err => {
         console.warn('[SW] Some files failed to cache:', err);
-        // At minimum cache the HTML
-        return cache.add('./lifeOS.html');
       });
     }).then(() => self.skipWaiting())
   );
@@ -39,17 +35,21 @@ self.addEventListener('activate', event => {
   );
 });
 
-// ── Fetch: serve from cache, fall back to network ────
+// ── Fetch: network-first for HTML, cache-first for assets ────
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Let Anthropic API calls go straight to network — never cache
-  if (url.hostname === 'api.anthropic.com') {
+  // Let API calls go straight to network — never cache
+  if (url.hostname === 'api.anthropic.com' ||
+      url.hostname === 'api.groq.com' ||
+      url.hostname === 'generativelanguage.googleapis.com' ||
+      url.hostname === 'api.openai.com' ||
+      url.hostname === 'api.perplexity.ai') {
     event.respondWith(fetch(event.request));
     return;
   }
 
-  // Let Google Fonts go to network with cache fallback
+  // Google Fonts: cache-first
   if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
     event.respondWith(
       caches.match(event.request).then(cached =>
@@ -63,21 +63,35 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // App shell: cache first, network fallback
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      if (cached) return cached;
-      return fetch(event.request).then(response => {
-        // Cache successful GET responses
-        if (event.request.method === 'GET' && response.status === 200) {
+  // lifeOS.html: NETWORK FIRST — always get latest when online
+  if (url.pathname.endsWith('lifeOS.html') || url.pathname.endsWith('/')) {
+    event.respondWith(
+      fetch(event.request).then(response => {
+        // Update cache with fresh version
+        if (response.status === 200) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
         }
         return response;
       }).catch(() => {
-        // If both cache and network fail, return the cached app shell
-        return caches.match('./lifeOS.html');
-      });
+        // Offline fallback to cache
+        return caches.match(event.request) || caches.match('./lifeOS.html');
+      })
+    );
+    return;
+  }
+
+  // Everything else: cache-first, network fallback
+  event.respondWith(
+    caches.match(event.request).then(cached => {
+      if (cached) return cached;
+      return fetch(event.request).then(response => {
+        if (event.request.method === 'GET' && response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        }
+        return response;
+      }).catch(() => caches.match('./lifeOS.html'));
     })
   );
 });

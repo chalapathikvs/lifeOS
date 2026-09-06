@@ -37,6 +37,11 @@ self.addEventListener('activate', event => {
 
 // ── Fetch: network-first for HTML, cache-first for assets ────
 self.addEventListener('fetch', event => {
+  // ?nocache=1 bypass — skip SW entirely, go straight to network
+  if (event.request.url.includes('nocache=1')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
   const url = new URL(event.request.url);
 
   // Let API calls go straight to network — never cache
@@ -142,4 +147,11 @@ self.addEventListener('notificationclick', event => {
       return self.clients.openWindow(event.notification.data?.url || './lifeOS.html');
     })
   );
+});
+
+// ── Version check — lets the HTML detect stale SW ────
+self.addEventListener('message', event => {
+  if (event.data?.type === 'GET_CACHE_NAME') {
+    event.ports[0]?.postMessage(CACHE_NAME);
+  }
 });

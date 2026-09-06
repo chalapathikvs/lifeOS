@@ -4089,9 +4089,34 @@ document.addEventListener('keydown', e => {
 });
 
 // ── Service Worker Registration ───────────────────────
+const EXPECTED_BUILD = '2026-09-06'; // update this on every deploy
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
+      // Self-healing: if any old SW is cached and serving stale content,
+      // unregister it so the next load gets a fresh SW and fresh HTML
+      const existingRegs = await navigator.serviceWorker.getRegistrations();
+      for (const reg of existingRegs) {
+        const sw = reg.active || reg.waiting || reg.installing;
+        if (sw) {
+          // Ask the SW what cache name it's using
+          const channel = new MessageChannel();
+          const cacheCheck = new Promise(resolve => {
+            channel.port1.onmessage = e => resolve(e.data);
+            setTimeout(() => resolve(null), 500); // timeout
+          });
+          sw.postMessage({ type: 'GET_CACHE_NAME' }, [channel.port2]);
+          const cacheName = await cacheCheck;
+          if (cacheName && !cacheName.includes(EXPECTED_BUILD)) {
+            console.log('[LifeOS] Stale SW detected, unregistering:', cacheName);
+            await reg.unregister();
+            window.location.reload();
+            return;
+          }
+        }
+      }
+
       const reg = await navigator.serviceWorker.register('./sw.js');
       console.log('[Life OS] SW registered:', reg.scope);
 

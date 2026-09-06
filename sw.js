@@ -1,7 +1,7 @@
 // Life OS Service Worker
 // CACHE_NAME uses ISO date — update on every deploy to bust cache
 
-const CACHE_NAME = 'lifeos-2026-04-19';
+const CACHE_NAME = 'lifeos-2026-09-06';
 
 // Files to cache on install — the complete app shell
 const CACHE_FILES = [
